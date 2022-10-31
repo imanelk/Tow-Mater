@@ -22,6 +22,7 @@
 "./Src/control.o"
 "./Src/dma.o"
 "./Src/gpio.o"
+"./Src/hook.o"
 "./Src/main.o"
 "./Src/power.o"
 "./Src/steering.o"

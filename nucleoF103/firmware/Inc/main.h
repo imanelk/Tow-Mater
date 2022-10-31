@@ -70,6 +70,7 @@
 #define US_GPIO_Port GPIOC
 
 
+
 #define PERIOD_UPDATE_US 50 //Period in ms to update us data
 
 	//CAN

@@ -1,0 +1,2 @@
+../Src/hook.c:3:6:lockHook	8	static
+../Src/hook.c:8:6:unlockHook	8	static

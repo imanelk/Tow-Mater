@@ -157,7 +157,7 @@ void CAN_FilterConfig(void)
 	sFilterConfig.FilterIdHigh = CAN_ID_MOTORS_CMD<<5;
 	sFilterConfig.FilterIdLow = CAN_ID_CALIBRATION_MODE<<5;
 	sFilterConfig.FilterMaskIdHigh = CAN_ID_COMM_CHECKING<<5;
-	//sFilterConfig.FilterMaskIdLow = 0xFFFF;
+	sFilterConfig.FilterMaskIdLow = CAN_ID_HOOK<<5;
 	sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
 	sFilterConfig.FilterActivation = ENABLE;
 	sFilterConfig.BankNumber = 14;
@@ -226,6 +226,12 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 	}else if (hcan->pRxMsg->StdId == CAN_ID_COMM_CHECKING && hcan->pRxMsg->Data[0]==COMM_CHECKING_REQUEST){	//Communication checking request
 
 		commCheckingRequest = 1;
+
+	}else if (hcan->pRxMsg->StdId == CAN_ID_HOOK && hcan->pRxMsg->Data[0]==HOOK_LOCK){
+		lockHook();
+
+	}else if (hcan->pRxMsg->StdId == CAN_ID_HOOK && hcan->pRxMsg->Data[0]==HOOK_UNLOCK){
+		unlockHook();
 	}
 		
 	__HAL_CAN_ENABLE_IT(hcan, CAN_IT_FMP0);
