@@ -50,6 +50,7 @@
 #include "calibrate.h"
 #include "timer.h"
 #include <FLASH_PAGE_F1.h>
+#include "hook.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -299,7 +300,7 @@ int main(void)
     while (1)
     {
         /* USER CODE END WHILE */
-        
+
         /* USER CODE BEGIN 3 */
     	if (US_FLAG==1)
 		{

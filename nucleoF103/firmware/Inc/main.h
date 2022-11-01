@@ -69,6 +69,10 @@
 
 #define US_GPIO_Port GPIOC
 
+	//Hook
+#define GPIO_PORT_HOOK GPIOB
+#define GPIO_PIN_HOOK GPIO_PIN_5
+
 
 
 #define PERIOD_UPDATE_US 50 //Period in ms to update us data
