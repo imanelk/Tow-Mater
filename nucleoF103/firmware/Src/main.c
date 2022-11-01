@@ -50,7 +50,6 @@
 #include "calibrate.h"
 #include "timer.h"
 #include <FLASH_PAGE_F1.h>
-#include "hook.h"
 
 /* USER CODE BEGIN Includes */
 

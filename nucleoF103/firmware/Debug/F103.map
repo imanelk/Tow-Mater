@@ -6799,7 +6799,7 @@ LOAD d:/applications/stm32cubeide_1.10.1/stm32cubeide/plugins/com.st.stm32cube.i
  .debug_ranges  0x0000000000000e50       0x10 ./Src/wheels.o
  .debug_ranges  0x0000000000000e60       0x20 ./Startup/startup_stm32f103rbtx.o
 
-.debug_macro    0x0000000000000000    0x1a5fc
+.debug_macro    0x0000000000000000    0x1a5f8
  .debug_macro   0x0000000000000000      0x34d ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
  .debug_macro   0x000000000000034d      0xa84 ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
  .debug_macro   0x0000000000000dd1       0xd6 ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
@@ -6900,17 +6900,17 @@ LOAD d:/applications/stm32cubeide_1.10.1/stm32cubeide/plugins/com.st.stm32cube.i
  .debug_macro   0x0000000000017ae3      0x333 ./Src/dma.o
  .debug_macro   0x0000000000017e16      0x33d ./Src/gpio.o
  .debug_macro   0x0000000000018153      0x333 ./Src/hook.o
- .debug_macro   0x0000000000018486      0x423 ./Src/main.o
- .debug_macro   0x00000000000188a9      0x333 ./Src/power.o
- .debug_macro   0x0000000000018bdc      0x389 ./Src/steering.o
- .debug_macro   0x0000000000018f65      0x329 ./Src/stm32f1xx_hal_msp.o
- .debug_macro   0x000000000001928e      0x337 ./Src/stm32f1xx_it.o
- .debug_macro   0x00000000000195c5      0x32f ./Src/system_stm32f1xx.o
- .debug_macro   0x00000000000198f4      0x33d ./Src/tim.o
- .debug_macro   0x0000000000019c31      0x346 ./Src/timer.o
- .debug_macro   0x0000000000019f77      0x33d ./Src/usart.o
- .debug_macro   0x000000000001a2b4      0x338 ./Src/wheels.o
- .debug_macro   0x000000000001a5ec       0x10 ./Src/wheels.o
+ .debug_macro   0x0000000000018486      0x41f ./Src/main.o
+ .debug_macro   0x00000000000188a5      0x333 ./Src/power.o
+ .debug_macro   0x0000000000018bd8      0x389 ./Src/steering.o
+ .debug_macro   0x0000000000018f61      0x329 ./Src/stm32f1xx_hal_msp.o
+ .debug_macro   0x000000000001928a      0x337 ./Src/stm32f1xx_it.o
+ .debug_macro   0x00000000000195c1      0x32f ./Src/system_stm32f1xx.o
+ .debug_macro   0x00000000000198f0      0x33d ./Src/tim.o
+ .debug_macro   0x0000000000019c2d      0x346 ./Src/timer.o
+ .debug_macro   0x0000000000019f73      0x33d ./Src/usart.o
+ .debug_macro   0x000000000001a2b0      0x338 ./Src/wheels.o
+ .debug_macro   0x000000000001a5e8       0x10 ./Src/wheels.o
 
 .debug_line     0x0000000000000000    0x188fa
  .debug_line    0x0000000000000000      0xaa8 ./Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
