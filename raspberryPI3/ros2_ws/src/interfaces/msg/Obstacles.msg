@@ -1,0 +1,1 @@
+int8[20] area # area[1] = -1 => area n°1 free ; area[1] = 20 => obstacle in the area n°1 at 20cm from the car
