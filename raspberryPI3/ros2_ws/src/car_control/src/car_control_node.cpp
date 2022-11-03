@@ -104,6 +104,8 @@ private:
     */
     void motorsFeedbackCallback(const interfaces::msg::MotorsFeedback & motorsFeedback){
         currentAngle = motorsFeedback.steering_angle;
+        currentLeftSpeed = motorsFeedback.left_rear_speed;
+        currentRightSpeed = motorsFeedback.right_rear_speed;
     }
 
 
@@ -132,12 +134,14 @@ private:
                 
                 manualPropulsionCmd(requestedThrottle, reverse, leftRearPwmCmd,rightRearPwmCmd);
 
-                steeringCmd(requestedSteerAngle,currentAngle, steeringPwmCmd);
+                steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
 
 
             //Autonomous Mode
             } else if (mode==1){
-                //...
+                // TO DO : implement the speed regulation 
+                autoPropulsionCmd(requestedSpeed, currentLeftSpeed, currentRightSpeed, leftRearPwmCmd, rightRearPwmCmd);
+
             }
         }
 
@@ -215,11 +219,14 @@ private:
     
     //Motors feedback variables
     float currentAngle;
+    float currentLeftSpeed;
+    float currentRightSpeed;
 
     //Manual Mode variables (with joystick control)
     bool reverse;
     float requestedThrottle;
     float requestedSteerAngle;
+    float requestedSpeed;
 
     //Control variables
     uint8_t leftRearPwmCmd;

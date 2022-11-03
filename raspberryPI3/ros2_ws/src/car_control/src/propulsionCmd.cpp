@@ -1,7 +1,6 @@
 #include "../include/car_control/propulsionCmd.h"
 
 
-
 /* Calculate rightRearPwmCmd and leftRearPwmCmd (PWM) in MANUAL mode (from joystick orders)
 *
 * The joystick sends throttle order, which is directly transformed into PWM. The PWMs are equal for both motors in Manual Mode
@@ -20,4 +19,26 @@ int * manualPropulsionCmd(float requestedThrottle, bool reverse, uint8_t& leftRe
 
     return 0;
 
+}
+
+/* Calculate rightRearPwmCmd and leftRearPwmCmd (PWM) in AUTO mode (from speed command)
+*
+* The command sends speed order, which is directly transformed into PWM. 
+* 
+*/
+int * autoPropulsionCmd(float requestedSpeed, float currentLeftSpeed, float currentRightSpeed, uint8_t& leftRearPwmCmd, uint8_t& rightRearPwmCmd){
+    float errorSpeed = currentLeftSpeed - requestedSpeed;
+
+   //Command's calculation
+	if (abs(errorSpeed)<TOLERANCE_SPEED){
+		leftRearPwmCmd = STOP;
+	}
+	else {
+        // TO DO : implement the regulation here
+	}
+
+    rightRearPwmCmd = leftRearPwmCmd;
+
+
+    return errorSpeed;
 }
