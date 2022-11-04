@@ -14,6 +14,7 @@ find_package(nav_msgs REQUIRED)
 
 add_executable(odometry_node 
   src/odometry_node.cpp
+  src/speedCalcul.cpp
 )
 
 ament_target_dependencies(odometry_node rclcpp interfaces nav_msgs)

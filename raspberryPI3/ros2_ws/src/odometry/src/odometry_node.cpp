@@ -8,6 +8,7 @@
 
 
 #include "../include/odometry/odometry_node.h"
+#include "../include/odometry/speedCalcul.h"
 
 using namespace std;
 using placeholders::_1;
@@ -56,10 +57,12 @@ private:
 
         auto odometry = nav_msgs::msg::Odometry();
 
-        // TO DO : Convert two RPM to one linear speed 
-        // ...
-        linearSpeed = 5;
+        // Convert from RPM to a m/s 
+        leftRearSpeed = rpmToMps(currentLeftRPM);
+        rightRearSpeed = rpmToMps(currentRightRPM);
 
+        // First version : the means of the two wheels speeds
+        linearSpeed = (leftRearSpeed + rightRearSpeed)/2;
 
 
         //Send odometries to car control 
