@@ -7,6 +7,7 @@
 #include "interfaces/msg/motors_feedback.hpp"
 #include "interfaces/msg/steering_calibration.hpp"
 #include "interfaces/msg/joystick_order.hpp"
+#include "interfaces/msg/cmd_vel.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 
 #include "std_srvs/srv/empty.hpp"
@@ -48,6 +49,9 @@ public:
 
         subscription_linear_speed_ = this->create_subscription<nav_msgs::msg::Odometry>(
         "linear_speed", 10, std::bind(&car_control::linearSpeedCallback, this, _1));
+
+        subscription_consign_speed_ = this->create_subscription<interfaces::msg::CmdVel>(
+        "consign_speed", 10, std::bind(&car_control::consignSpeedCallback, this, _1));
 
         
 
@@ -118,6 +122,15 @@ private:
     */
     void linearSpeedCallback(const nav_msgs::msg::Odometry & odometry){
         currentCarSpeedMPS = odometry.twist.twist.linear.x;
+    }
+
+    /* Update currentSpeed from odometry [callback function]  :
+    *
+    * This function is called when a message is published on the "/odometry" topic
+    * 
+    */
+    void consignSpeedCallback(const interfaces::msg::CmdVel & cmdVel){
+        requestedWheelsSpeedMPS = cmdVel.velocity;
     }
 
     
@@ -265,6 +278,7 @@ private:
     rclcpp::Subscription<interfaces::msg::MotorsFeedback>::SharedPtr subscription_motors_feedback_;
     rclcpp::Subscription<interfaces::msg::SteeringCalibration>::SharedPtr subscription_steering_calibration_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_linear_speed_;
+    rclcpp::Subscription<interfaces::msg::CmdVel>::SharedPtr subscription_consign_speed_;
 
     //Timer
     rclcpp::TimerBase::SharedPtr timer_;

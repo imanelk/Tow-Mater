@@ -48,7 +48,17 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
     float errorSub = errorCurrent - errorPrevious; 
     errorPrevious = errorCurrent;
     
-    RearPwmCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
+    float speedCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
+
+    // PWM limits in forward
+    if ( speedCmd > 100 )
+    {
+        speedCmd = 100; 
+    }
+    else if ( speedCmd < 50 )
+    {
+        speedCmd = 50;
+    }
   
     return 0;
 }
@@ -62,7 +72,7 @@ float mpsToRpm(float currentMPS){
     float rearSpeed;
     float perimeter = 2*3.14*WHEEL_DIAMETER/1000; // in meters
     
-    rearSpeed = currentRPM*60/perimeter;
+    rearSpeed = currentMPS*60/perimeter;
 
     return rearSpeed;
 }
