@@ -25,7 +25,7 @@ int * manualPropulsionCmd(float requestedThrottle, bool reverse, uint8_t& leftRe
 * This regulation has to be done on each wheels.
 * 
 */
-int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& RearPwmCmd);
+int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& RearPwmCmd, float& errorPrevious);
 
 /* 
 *
