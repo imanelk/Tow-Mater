@@ -7,6 +7,7 @@
 #include "interfaces/msg/motors_feedback.hpp"
 #include "interfaces/msg/steering_calibration.hpp"
 #include "interfaces/msg/joystick_order.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 
 #include "std_srvs/srv/empty.hpp"
 
@@ -45,6 +46,8 @@ public:
         subscription_steering_calibration_ = this->create_subscription<interfaces::msg::SteeringCalibration>(
         "steering_calibration", 10, std::bind(&car_control::steeringCalibrationCallback, this, _1));
 
+        subscription_linear_speed_ = this->create_subscription<nav_msgs::msg::Odometry>(
+        "linear_speed", 10, std::bind(&car_control::linearSpeedCallback, this, _1));
 
         
 
@@ -104,10 +107,20 @@ private:
     */
     void motorsFeedbackCallback(const interfaces::msg::MotorsFeedback & motorsFeedback){
         currentAngle = motorsFeedback.steering_angle;
-        currentLeftSpeed = motorsFeedback.left_rear_speed;
-        currentRightSpeed = motorsFeedback.right_rear_speed;
+        currentLeftSpeedRPM = motorsFeedback.left_rear_speed;
+        currentRightSpeedRPM = motorsFeedback.right_rear_speed;
     }
 
+    /* Update currentSpeed from odometry [callback function]  :
+    *
+    * This function is called when a message is published on the "/odometry" topic
+    * 
+    */
+    void linearSpeedCallback(const nav_msgs::msg::Odometry & odometry){
+        currentCarSpeedMPS = odometry.twist.twist.linear.x;
+    }
+
+    
 
     /* Update PWM commands : leftRearPwmCmd, rightRearPwmCmd, steeringPwmCmd
     *
@@ -139,10 +152,12 @@ private:
 
             //Autonomous Mode
             } else if (mode==1){
-                // TO DO : implement the speed regulation 
-                currentLeftSpeed = currentLeftSpeed;
-                currentRightSpeed = currentRightSpeed;
-                autoPropulsionCmd(requestedSpeed, currentLeftSpeed, currentRightSpeed, leftRearPwmCmd, rightRearPwmCmd);
+                //The speed command in m/s is converted in RPM
+                requestedWheelsSpeedRPM = mpsToRpm(requestedWheelsSpeedMPS);
+
+                //Speed control on the wheels' speeds in RPM
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd); 
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd);
 
             }
         }
@@ -221,19 +236,25 @@ private:
     
     //Motors feedback variables
     float currentAngle;
-    float currentLeftSpeed;
-    float currentRightSpeed;
+    float currentLeftSpeedRPM;
+    float currentRightSpeedRPM;
+    float currentCarSpeedMPS;
 
     //Manual Mode variables (with joystick control)
     bool reverse;
     float requestedThrottle;
     float requestedSteerAngle;
-    float requestedSpeed;
 
-    //Control variables
+    //Auto Mode variables
+    float requestedWheelsSpeedRPM;
+    float requestedWheelsSpeedMPS;
+
+    //Wheels control variables
     uint8_t leftRearPwmCmd;
     uint8_t rightRearPwmCmd;
     uint8_t steeringPwmCmd;
+
+
 
     //Publishers
     rclcpp::Publisher<interfaces::msg::MotorsOrder>::SharedPtr publisher_can_;
@@ -243,6 +264,7 @@ private:
     rclcpp::Subscription<interfaces::msg::JoystickOrder>::SharedPtr subscription_joystick_order_;
     rclcpp::Subscription<interfaces::msg::MotorsFeedback>::SharedPtr subscription_motors_feedback_;
     rclcpp::Subscription<interfaces::msg::SteeringCalibration>::SharedPtr subscription_steering_calibration_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_linear_speed_;
 
     //Timer
     rclcpp::TimerBase::SharedPtr timer_;

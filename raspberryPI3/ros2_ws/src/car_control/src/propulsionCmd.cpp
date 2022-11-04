@@ -21,24 +21,47 @@ int * manualPropulsionCmd(float requestedThrottle, bool reverse, uint8_t& leftRe
 
 }
 
-/* Calculate rightRearPwmCmd and leftRearPwmCmd (PWM) in AUTO mode (from speed command)
+
+/* Calculate RearPwmCmd  (PWM) in AUTO mode (from speed command)
 *
 * The command sends speed order, which is directly transformed into PWM. 
+* This regulation has to be done on each wheels.
 * 
 */
-int * autoPropulsionCmd(float requestedSpeed, float currentLeftSpeed, float currentRightSpeed, uint8_t& leftRearPwmCmd, uint8_t& rightRearPwmCmd){
-   float errorSpeed = currentLeftSpeed - requestedSpeed;
+int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& RearPwmCmd){
+    //PID parameters
+    const float kp = 200; 
+    const float ki = 5; 
+    const float kd = 100; 
 
-   //Command's calculation
-	if (abs(errorSpeed)<TOLERANCE_SPEED){
-		leftRearPwmCmd = STOP;
-	}
-	else {
-        // TO DO : implement the regulation here
-	}
+    //Errors
+    float errorSum = 0;
+    float errorPrevious = requestedSpeed; 
 
-    rightRearPwmCmd = leftRearPwmCmd;
+    // P
+    float errorCurrent = requestedSpeed-currentSpeed;
 
-
+    // I
+    errorSum += errorCurrent;  
+    
+    // D
+    float errorSub = errorCurrent - errorPrevious; 
+    errorPrevious = errorCurrent;
+    
+    RearPwmCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
+  
     return 0;
+}
+
+/* 
+*
+* Compute the RPM speed from a m/s.
+* 
+*/
+float mpsToRpm(float currentMPS){
+    float rearSpeed;
+    
+    rearSpeed = currentMPS*(WHEEL_DIAMETER*1000)/60;
+
+    return rearSpeed;
 }
