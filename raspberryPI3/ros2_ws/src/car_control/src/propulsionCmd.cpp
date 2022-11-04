@@ -48,16 +48,16 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
     float errorSub = errorCurrent - errorPrevious; 
     errorPrevious = errorCurrent;
     
-    float speedCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
+    RearPwmCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
 
     // PWM limits in forward
-    if ( speedCmd > 100 )
+    if ( RearPwmCmd > 100 )
     {
-        speedCmd = 100; 
+        RearPwmCmd = 100; 
     }
-    else if ( speedCmd < 50 )
+    else if ( RearPwmCmd < 50 )
     {
-        speedCmd = 50;
+        RearPwmCmd = 50;
     }
   
     return 0;
