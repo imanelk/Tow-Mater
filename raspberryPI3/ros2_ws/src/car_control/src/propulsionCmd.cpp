@@ -27,7 +27,7 @@ int * manualPropulsionCmd(float requestedThrottle, bool reverse, uint8_t& leftRe
 * 
 */
 int * autoPropulsionCmd(float requestedSpeed, float currentLeftSpeed, float currentRightSpeed, uint8_t& leftRearPwmCmd, uint8_t& rightRearPwmCmd){
-   float errorSpeed =currentLeftSpeed - requestedSpeed;
+   float errorSpeed = currentLeftSpeed - requestedSpeed;
 
    //Command's calculation
 	if (abs(errorSpeed)<TOLERANCE_SPEED){

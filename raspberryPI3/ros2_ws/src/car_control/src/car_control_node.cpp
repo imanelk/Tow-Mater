@@ -140,6 +140,8 @@ private:
             //Autonomous Mode
             } else if (mode==1){
                 // TO DO : implement the speed regulation 
+                currentLeftSpeed = currentLeftSpeed;
+                currentRightSpeed = currentRightSpeed;
                 autoPropulsionCmd(requestedSpeed, currentLeftSpeed, currentRightSpeed, leftRearPwmCmd, rightRearPwmCmd);
 
             }
