@@ -28,12 +28,7 @@ int * manualPropulsionCmd(float requestedThrottle, bool reverse, uint8_t& leftRe
 * This regulation has to be done on each wheels.
 * 
 */
-int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& RearPwmCmd, float& errorPrevious){
-    //PID parameters
-    const float kp = 20; 
-    const float ki = 5; 
-    const float kd = 0; 
-
+int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& RearPwmCmd, float& errorPrevious, float Kp, float Ki, float Kd){
     //Errors
     float errorSum = 0;
  
@@ -47,7 +42,7 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
     float errorSub = errorCurrent - errorPrevious; 
     errorPrevious = errorCurrent;
     
-    RearPwmCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
+    RearPwmCmd = Kp*errorCurrent + Ki*errorSum + Kd*errorSub; 
 
     // PWM limits in forward
     if ( RearPwmCmd > 100 )

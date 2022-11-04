@@ -8,6 +8,7 @@
 #include "interfaces/msg/steering_calibration.hpp"
 #include "interfaces/msg/joystick_order.hpp"
 #include "interfaces/msg/cmd_vel.hpp"
+#include "interfaces/msg/pid.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 
 #include "std_srvs/srv/empty.hpp"
@@ -52,6 +53,9 @@ public:
 
         subscription_consign_speed_ = this->create_subscription<interfaces::msg::CmdVel>(
         "consign_speed", 10, std::bind(&car_control::consignSpeedCallback, this, _1));
+
+        subscription_pid_ = this->create_subscription<interfaces::msg::Pid>(
+        "pid", 10, std::bind(&car_control::pidCallback, this, _1));
 
         
 
@@ -133,6 +137,17 @@ private:
         requestedWheelsSpeedMPS = cmdVel.velocity;
     }
 
+    /* Update currentSpeed from odometry [callback function]  :
+    *
+    * This function is called when a message is published on the "/odometry" topic
+    * 
+    */
+    void pidCallback(const interfaces::msg::Pid & pid){
+        Kp = pid.kp;
+        Ki = pid.ki;
+        Kd = pid.kd;
+    }
+
     
 
     /* Update PWM commands : leftRearPwmCmd, rightRearPwmCmd, steeringPwmCmd
@@ -170,8 +185,8 @@ private:
                 errorPrevious = requestedWheelsSpeedRPM;
 
                 //Speed control on the wheels' speeds in RPM
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPrevious); 
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPrevious);
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPrevious, Kp, Ki, Kd); 
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPrevious, Kp, Ki, Kd);
 
             }
         }
@@ -269,6 +284,11 @@ private:
     uint8_t rightRearPwmCmd;
     uint8_t steeringPwmCmd;
 
+    // PID coefficients
+    float Kp;
+    float Ki;
+    float Kd;
+
 
 
     //Publishers
@@ -281,6 +301,8 @@ private:
     rclcpp::Subscription<interfaces::msg::SteeringCalibration>::SharedPtr subscription_steering_calibration_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_linear_speed_;
     rclcpp::Subscription<interfaces::msg::CmdVel>::SharedPtr subscription_consign_speed_;
+    rclcpp::Subscription<interfaces::msg::Pid>::SharedPtr subscription_pid_;
+
 
     //Timer
     rclcpp::TimerBase::SharedPtr timer_;
