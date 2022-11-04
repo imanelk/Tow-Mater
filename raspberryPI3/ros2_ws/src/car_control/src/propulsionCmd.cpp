@@ -1,5 +1,4 @@
 #include "../include/car_control/propulsionCmd.h"
-#include <cstdio>
 
 
 /* Calculate rightRearPwmCmd and leftRearPwmCmd (PWM) in MANUAL mode (from joystick orders)
@@ -40,7 +39,6 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
  
     // P
     float errorCurrent = abs(requestedSpeed)-currentSpeed;
-    printf("RPM error :%f \n", errorCurrent);
 
     // I
     errorSum += errorCurrent;  
@@ -50,7 +48,6 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
     errorPrevious = errorCurrent;
     
     RearPwmCmd = kp*errorCurrent + ki*errorSum + kd*errorSub; 
-    printf("PWM before restriction :%d \n", RearPwmCmd);
 
     // PWM limits in forward
     if ( RearPwmCmd > 100 )
