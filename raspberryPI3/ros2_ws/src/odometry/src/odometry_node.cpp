@@ -79,9 +79,9 @@ private:
     float currentRightRPM;
 
     //Speed variables
-    uint8_t linearSpeed;
-    uint8_t leftRearSpeed;
-    uint8_t rightRearSpeed;
+    float linearSpeed;
+    float leftRearSpeed;
+    float rightRearSpeed;
 
     //Publishers
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr publisher_car_control_;

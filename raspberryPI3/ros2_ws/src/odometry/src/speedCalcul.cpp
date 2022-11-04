@@ -8,8 +8,9 @@
 */
 float rpmToMps(float currentRPM){
     float rearSpeed;
+    float perimeter = 2*3.14*WHEEL_DIAMETER/1000; // in meters
     
-    rearSpeed = 60*currentRPM/(WHEEL_DIAMETER*1000);
+    rearSpeed = currentRPM*perimeter/60;
 
     return rearSpeed;
 }

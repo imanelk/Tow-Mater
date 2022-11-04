@@ -60,8 +60,9 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
 */
 float mpsToRpm(float currentMPS){
     float rearSpeed;
+    float perimeter = 2*3.14*WHEEL_DIAMETER/1000; // in meters
     
-    rearSpeed = currentMPS*(WHEEL_DIAMETER*1000)/60;
+    rearSpeed = currentRPM*60/perimeter;
 
     return rearSpeed;
 }
