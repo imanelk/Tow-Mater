@@ -42,7 +42,7 @@ public:
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER);
-
+ 
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
     }
@@ -69,7 +69,13 @@ private:
     * 
     */
     void obstaclesFeedback(const interfaces::msg::Obstacles & obstaclesMsg){
-        for (int i=0 ; i<NUMBER_OF_CRITICAL_AREAS ; i++)
+
+        if (obstaclesReceived != 1){
+            RCLCPP_WARN(this->get_logger(),"Obstacle analysis received [OK]");
+            obstaclesReceived = 1;
+        }
+
+        for (int i=0 ; i<6 ; i++)
             areaStatus[i] = obstaclesMsg.area[i];
     }
 
@@ -93,6 +99,9 @@ private:
 
         if (velocity == 0 || !safeMode)
             return true;        //not moving => safe
+
+        if (obstaclesReceived !=1) //If the obstacle analysis has not yet been received on the /obstacles topic
+            return false;
 
 
         //If the car is moving, check the corresponding areas
@@ -151,11 +160,11 @@ private:
     *
     */
     void lockHook(){
-        auto hookLockMsg = interfaces::msg::Hook();
+        auto hookMsg = interfaces::msg::Hook();
 
-        hookLockMsg.type = "lock";
-        hookLockMsg.status = true;
-        publisher_cmd_hook_->publish(hookLockMsg);
+        hookMsg.type = "lock";
+        hookMsg.status = true;
+        publisher_cmd_hook_->publish(hookMsg);
 
         RCLCPP_INFO(this->get_logger(), "Hook Locking");
         sleep(LOCK_WAITING_TIME);
@@ -164,32 +173,90 @@ private:
         
     }
 
+
+    /* Publish the hook unlocking order on the /hook topic
+    *
+    */
+    void unlockHook(){
+        auto hookMsg = interfaces::msg::Hook();
+
+        hookMsg.type = "lock";
+        hookMsg.status = false;
+        publisher_cmd_hook_->publish(hookMsg);
+
+        RCLCPP_INFO(this->get_logger(), "Hook Unlocking");
+        sleep(LOCK_WAITING_TIME);
+
+        hookLocked = false;
+        
+    }
+
     /*  Manages the movements of the car: Decision-making entity  */
     void motionPlanning(){
+
+        if (obstaclesReceived != 1){  
+
+            if (obstaclesReceived != -1){    //To print the message once
+                RCLCPP_WARN(this->get_logger(),"Obstacle analysis not received [waiting]");
+                obstaclesReceived = -1;
+            }
+            return;
+        }
 
         if (finalReverse){
     
             sendSteer(0.0);
 
-            if (hookDetected && !hookLocked){
+            if (hookDetected && !hookLocked){   
 
-                if (areaStatus[4] > LOCK_DISTANCE){
+                if (areaStatus[4] == -1) {
+                    RCLCPP_ERROR(this->get_logger(),"Inconsistent events : Hook detected but no obstacle detected");
+                    RCLCPP_ERROR(this->get_logger(),"Final reverse - FAILED");
+                    sendVel(0.0);
+                    finalReverse = false;
+              
+                }else if (areaStatus[4] > LOCK_DISTANCE){     //Hook detected => Slow movement until locking distance is reached
                     safeMode = false;
                     sendVel(0.5*FINAL_REVERSE_VELOCITY);
 
-                }else{ 
+                }else{                  //Lock distance reached => Stop and lock
                     sendVel(0.0);
+                    sleep(2);
                     lockHook();
                     safeMode = true;
-                }
+                    finalReverse = false;
 
-            } else if (hookLocked){
-                sendVel(TOWING_VELOCITY);
+                    RCLCPP_WARN(this->get_logger(),"Start of the towing process");
+                    towing = true;
+                }
 
             } else{
                 sendVel(FINAL_REVERSE_VELOCITY);
             }
-        }
+
+        }else if (towing){
+
+            if (hookLocked){
+                
+                localMsCounter += PERIOD_UPDATE_MOTION;
+
+                if (localMsCounter <= TOWING_DURATION){    //Towing
+                    sendVel(TOWING_VELOCITY);
+
+                } else{     //End of the towing step
+                    sendVel(0.0);
+                    sleep(2);
+                    unlockHook();
+
+                    localMsCounter = 0ms;
+
+                    RCLCPP_WARN(this->get_logger(),"End of the towing process");
+                    towing = false;
+                }
+            }
+
+        }else 
+            sendVel(0.0);
         
     }
     
@@ -198,10 +265,15 @@ private:
 
     //Steps
     bool finalReverse = false;
+    bool towing = false;
 
     //Security
-    int8_t areaStatus[20];
+    int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
+    int16_t areaStatus[20];
     bool safeMode;    //If false, the automatic safety control is disabled !! (see safe() function)
+
+    //Time counter
+    chrono::milliseconds localMsCounter = 0ms;
 
     float currentVelocity;
     float currentSteer;
