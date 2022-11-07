@@ -183,11 +183,10 @@ private:
                 //The speed command in m/s is converted in RPM
                 requestedWheelsSpeedRPM = mpsToRpm(requestedWheelsSpeedMPS);
                 errorPrevious = requestedWheelsSpeedRPM;
+                errorSum = 0;
 
-                //Speed control on the wheels' speeds in RPM
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPrevious, Kp, Ki, Kd); 
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPrevious, Kp, Ki, Kd);
-
+                //Speed control on the left wheel speed in RPM
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPrevious, errorSum, Kp, Ki, Kd); 
             }
         }
 
@@ -269,6 +268,7 @@ private:
     float currentRightSpeedRPM;
     float currentCarSpeedMPS;
     float errorPrevious;
+    float errorSum;
 
     //Manual Mode variables (with joystick control)
     bool reverse;
