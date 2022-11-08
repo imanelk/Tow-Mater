@@ -33,7 +33,7 @@ public:
         "hook", 10, std::bind(&motion_planning::hookCallback, this, _1));
 
         subscription_obstacles_ = this->create_subscription<interfaces::msg::Obstacles>(
-        "obstacles", 10, std::bind(&motion_planning::obstaclesFeedback, this, _1));
+        "obstacle", 10, std::bind(&motion_planning::obstaclesFeedback, this, _1));
 
 
         timer_security_ = this->create_wall_timer(PERIOD_CHECK_SECURITY, std::bind(&motion_planning::checkSecurity, this));
