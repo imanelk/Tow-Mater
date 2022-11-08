@@ -135,6 +135,14 @@ private:
     */
     void consignSpeedCallback(const interfaces::msg::CmdVel & cmdVel){
         requestedWheelsSpeedMPS = cmdVel.velocity;
+        //The speed command in m/s is converted in RPM
+        requestedWheelsSpeedRPM = mpsToRpm(requestedWheelsSpeedMPS);
+        // Initialize the command errors
+        errorPreviousLeft = requestedWheelsSpeedRPM;
+        errorPreviousRight = requestedWheelsSpeedRPM;
+        errorSumLeft = 0;
+        errorSumRight = 0;
+
     }
 
     /* Update currentSpeed from odometry [callback function]  :
@@ -180,13 +188,12 @@ private:
 
             //Autonomous Mode
             } else if (mode==1){
-                //The speed command in m/s is converted in RPM
-                requestedWheelsSpeedRPM = mpsToRpm(requestedWheelsSpeedMPS);
-                errorPrevious = requestedWheelsSpeedRPM;
-                errorSum = 0;
+
 
                 //Speed control on the left wheel speed in RPM
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPrevious, errorSum, Kp, Ki, Kd); 
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
+
             }
         }
 
@@ -267,8 +274,11 @@ private:
     float currentLeftSpeedRPM;
     float currentRightSpeedRPM;
     float currentCarSpeedMPS;
-    float errorPrevious;
-    float errorSum;
+    float errorPreviousLeft;
+    float errorPreviousRight;
+    float errorSumLeft;
+    float errorSumRight;
+
 
     //Manual Mode variables (with joystick control)
     bool reverse;
