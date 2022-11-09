@@ -33,9 +33,16 @@ def generate_launch_description():
         emulate_tty=True
     )
 
+    vision_node = Node(
+        package="vision",
+        executable="vision_node",
+        emulate_tty=True
+    )
+
 
     ld.add_action(lidar_node)
     ld.add_action(camera_node)
+    ld.add_action(vision_node)
     ld.add_action(system_check_ack_node)
 
     return ld
