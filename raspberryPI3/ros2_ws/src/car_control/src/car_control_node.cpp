@@ -182,7 +182,6 @@ private:
             if (mode==0){
                 
                 manualPropulsionCmd(requestedThrottle, reverse, leftRearPwmCmd,rightRearPwmCmd);
-
                 steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
 
 
@@ -192,7 +191,7 @@ private:
 
                 //Speed control on the left wheel speed in RPM
                 autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
+                autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
 
             }
         }

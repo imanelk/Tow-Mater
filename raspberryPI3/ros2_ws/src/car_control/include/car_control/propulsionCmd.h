@@ -8,6 +8,7 @@
 #define STOP 50
 #define MAX_PWM_LEFT 0
 #define MAX_PWM_RIGHT 100
+#define MOTOR 1.2
 
 
 #define WHEEL_DIAMETER 195 //Wheel diameters in [mm]
