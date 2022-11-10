@@ -82,6 +82,9 @@ class Vision(Node):
 
 
     def image_callback(self, imgMsg):
+        
+        hookDetected = False
+        
         img = self.bridge.imgmsg_to_cv2(imgMsg, desired_encoding='passthrough')
         
         # Mask of purple color
