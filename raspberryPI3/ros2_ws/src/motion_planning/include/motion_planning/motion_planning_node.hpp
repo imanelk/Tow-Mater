@@ -10,16 +10,16 @@
 #define INITIAL_VELOCITY 0
 #define INITIAL_STEER 0
 
-#define MAX_VELOCITY 1.0   // [m/s]
+#define MAX_VELOCITY 1.2   // [m/s]
 
 // ---- Final reverse and towing ----
 
-#define FINAL_REVERSE_VELOCITY -(0.5*MAX_VELOCITY) // [m/s]
+#define FINAL_REVERSE_VELOCITY -0.8 // [m/s]
 
 #define LOCK_DISTANCE 7    // Lock distance (between US rear center and the damaged car) [cm]
 #define LOCK_WAITING_TIME 4 //Waiting time after the lock order [s]
 
-#define TOWING_VELOCITY (0.8*MAX_VELOCITY) // [m/s]
+#define TOWING_VELOCITY 1.0 // [m/s]
 #define TOWING_DURATION 5000ms
  
 
