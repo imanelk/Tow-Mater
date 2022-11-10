@@ -29,9 +29,17 @@ int * manualPropulsionCmd(float requestedThrottle, bool reverse, uint8_t& leftRe
 * 
 */
 int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& RearPwmCmd, float& errorPrevious, float& errorSum, float Kp, float Ki, float Kd){
+    bool forward;
+
+    if (requestedSpeed > 0)
+        forward = true;
+    else 
+        forward = false;
+
+    float consignSpeed = abs(requestedSpeed);
 
     // P
-    float errorCurrent = abs(requestedSpeed)-currentSpeed;
+    float errorCurrent = consignSpeed-currentSpeed;
 
     // I
     errorSum += errorCurrent;  
@@ -40,12 +48,22 @@ int * autoPropulsionCmd(float requestedSpeed, float currentSpeed,  uint8_t& Rear
     float errorSub = errorCurrent - errorPrevious; 
     errorPrevious = errorCurrent;
     
-    // PID result : 
-    RearPwmCmd = Kp*errorCurrent + Ki*errorSum + Kd*errorSub; 
+    // PID result
+    if (forward)
+        RearPwmCmd = Kp*errorCurrent + Ki*errorSum + Kd*errorSub + 50.0; 
+    else
+        RearPwmCmd = -(Kp*errorCurrent + Ki*errorSum + Kd*errorSub) + 50.0; 
 
-    if (RearPwmCmd>100){
+
+    // Limiter
+    if (RearPwmCmd>100)
         RearPwmCmd = 100;
-    }
+
+    if (forward && RearPwmCmd<50)
+        RearPwmCmd = 50;
+    else if (!forward && RearPwmCmd>50)
+        RearPwmCmd = 50;
+
   
     return 0;
 }

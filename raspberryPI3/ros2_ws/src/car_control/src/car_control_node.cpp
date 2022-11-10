@@ -138,8 +138,8 @@ private:
         //The speed command in m/s is converted in RPM
         requestedWheelsSpeedRPM = mpsToRpm(requestedWheelsSpeedMPS);
         // Initialize the command errors
-        errorPreviousLeft = requestedWheelsSpeedRPM;
-        errorPreviousRight = requestedWheelsSpeedRPM;
+        errorPreviousLeft = 0;
+        errorPreviousRight = 0;
         errorSumLeft = 0;
         errorSumRight = 0;
 
@@ -192,7 +192,7 @@ private:
                 //Speed control on the left wheel speed in RPM
                 autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
                 autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
-
+                steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
             }
         }
 
