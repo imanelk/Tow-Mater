@@ -127,7 +127,7 @@ class Vision(Node):
 
         # Publication on the /hook topic
         msgHook = Hook()
-        msgHook.type = 'Detect'
+        msgHook.type = 'detect'
         msgHook.status = hookDetected
 
         self.publisher_hook_.publish(msgHook)
