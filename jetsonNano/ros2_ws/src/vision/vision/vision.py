@@ -83,9 +83,11 @@ class Vision(Node):
 
     def image_callback(self, imgMsg):
         img = self.bridge.imgmsg_to_cv2(imgMsg, desired_encoding='passthrough')
-
         
-        ## Images processing 
+        # Mask of purple color
+        image = cv2.inRange(img, (0, 0, 50), (50, 50, 255))
+        
+        ## Image processing 
         resized = imutils.resize(image, width=300) #redimensionnement
         ratio = image.shape[0] / float(resized.shape[0])
         
