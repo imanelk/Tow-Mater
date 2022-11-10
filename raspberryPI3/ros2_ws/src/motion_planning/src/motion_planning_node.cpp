@@ -23,7 +23,7 @@ public:
         currentSteer = -1, 
         finalReverse = true;
 
-        publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("cmd/vel", 10);
+        publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
         publisher_cmd_steer_= this->create_publisher<interfaces::msg::CmdSteer>("cmd/steer", 10);
         publisher_cmd_hook_= this->create_publisher<interfaces::msg::Hook>("hook", 10);
 
