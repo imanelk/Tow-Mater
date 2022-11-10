@@ -31,9 +31,11 @@
 *.out
 *.app
 
-# ros2_ws 
+# ros2_ws
 build/
 install/
 log/
+
 # vscode config
+
 .vscode/
