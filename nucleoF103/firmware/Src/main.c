@@ -85,11 +85,13 @@ uint32_t VMG_mes = 0, VMD_mes = 0, per_vitesseG = 0, per_vitesseD = 0;
 int nbImpulsionG = 0;
 int nbImpulsionD = 0;
 
+int sendTrig = 1;
 int usEchoStart = 1;
 int usEchoReceived = 0;
 uint64_t usEchoRisingTime = 0;
 uint64_t usEchoDuration=0;
 int currentUs = 0;
+int cnt = 0; 	//Count the US measurement time (timeout)
 
 uint16_t usTriggerPin[6] = {US_Front_Left_Trig_Pin,US_Front_Center_Trig_Pin,US_Front_Right_Trig_Pin,US_Rear_Left_Trig_Pin,US_Rear_Center_Trig_Pin,US_Rear_Right_Trig_Pin};
 
@@ -309,22 +311,37 @@ int main(void)
 				currentUs = 0;
 			}
 
-			usEchoStart = 1;
+			if (sendTrig){
+				usEchoStart = 1;
 
-			HAL_GPIO_WritePin( US_GPIO_Port, usTriggerPin[currentUs], GPIO_PIN_SET); //Trigger ON
-			SYS_MicroDelay(10);
-			HAL_GPIO_WritePin( US_GPIO_Port, usTriggerPin[currentUs], GPIO_PIN_RESET); //Trigger OFF
+				HAL_GPIO_WritePin( US_GPIO_Port, usTriggerPin[currentUs], GPIO_PIN_SET); //Trigger ON
+				SYS_MicroDelay(10);
+				HAL_GPIO_WritePin( US_GPIO_Port, usTriggerPin[currentUs], GPIO_PIN_RESET); //Trigger OFF
+				sendTrig = 0;
 
-			HAL_Delay(40);	//Waiting to receive the echo
+			} else {
+				cnt += PERIOD_UPDATE_US;
 
-			if (usEchoReceived)	//If we received the echo
-				usDistance[currentUs] = usEchoDuration/58;
+				if (usEchoReceived){	//If we received the echo
 
-			else //If the echo is not received (i.e. sensor failure)
-				usDistance[currentUs] = 1000;	//Set distance value out of range
+					usDistance[currentUs] = usEchoDuration/58;
 
-			usEchoReceived = 0;
-			currentUs+=1;
+					usEchoReceived = 0;
+					cnt = 0;
+					currentUs+=1;
+					sendTrig = 1;
+
+				}else if (cnt >= TIMEOUT_US){ //If the echo is not received (i.e. sensor failure)
+
+					usDistance[currentUs] = 1000;	//Set distance value out of range
+
+					usEchoReceived = 0;
+					cnt = 0;
+					currentUs+=1;
+					sendTrig = 1;
+				}
+			}
+
 
 			if (currentUs == 6){	//When all the us sensors have been performed, restart with first us sensor (0) and send data to can
 				currentUs = 0;
