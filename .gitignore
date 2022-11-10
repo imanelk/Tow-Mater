@@ -37,4 +37,5 @@ install/
 log/
 
 # vscode config
+
 .vscode/
