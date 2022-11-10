@@ -36,5 +36,6 @@ build/
 install/
 log/
 
-# config vscode
+# vscode config
+
 .vscode/
