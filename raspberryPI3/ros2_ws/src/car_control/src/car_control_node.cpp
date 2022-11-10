@@ -31,6 +31,13 @@ public:
         mode = 0;
         requestedThrottle = 0;
         requestedSteerAngle = 0;
+
+        requestedWheelsSpeedRPM = 0.0;
+        requestedWheelsSpeedMPS = 0.0;
+
+        Kp = 0.8;
+        Ki = 0.0;
+        Kd = 0.0;
     
 
         publisher_can_= this->create_publisher<interfaces::msg::MotorsOrder>("motors_order", 10);
