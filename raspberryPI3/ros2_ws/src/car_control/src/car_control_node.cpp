@@ -195,11 +195,18 @@ private:
             //Autonomous Mode
             } else if (mode==1){
 
-
-                //Speed control on the left wheel speed in RPM
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
-                autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
-                steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
+                if (requestedWheelsSpeedRPM == 0.0){
+                    leftRearPwmCmd = STOP;
+                    rightRearPwmCmd = STOP;
+                    steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
+                }
+                else{
+                    //Speed control on the left wheel speed in RPM
+                    autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
+                    autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
+                    steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
+                }
+                
             }
         }
 
