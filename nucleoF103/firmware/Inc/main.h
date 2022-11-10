@@ -69,11 +69,17 @@
 
 #define US_GPIO_Port GPIOC
 
+	//Hook
+#define GPIO_PORT_HOOK GPIOB
+#define GPIO_PIN_HOOK GPIO_PIN_5
 
-#define PERIOD_UPDATE_US 50 //Period in ms to update us data
+
+
+#define PERIOD_UPDATE_US 5 //Period in ms to update us data
+#define TIMEOUT_US 50 //Timeout for US measurements [ms]
 
 	//CAN
-#define PERIOD_SEND_MOTORS 100 // Period in ms to send motors data
+#define PERIOD_SEND_MOTORS 5 // Period in ms to send motors data
 #define PERIOD_SEND_BATT 2000 // Period in ms to send battery level
 /* USER CODE END Private defines */
 

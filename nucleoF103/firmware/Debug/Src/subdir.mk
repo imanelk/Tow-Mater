@@ -12,6 +12,7 @@ C_SRCS += \
 ../Src/control.c \
 ../Src/dma.c \
 ../Src/gpio.c \
+../Src/hook.c \
 ../Src/main.c \
 ../Src/power.c \
 ../Src/steering.c \
@@ -31,6 +32,7 @@ OBJS += \
 ./Src/control.o \
 ./Src/dma.o \
 ./Src/gpio.o \
+./Src/hook.o \
 ./Src/main.o \
 ./Src/power.o \
 ./Src/steering.o \
@@ -50,6 +52,7 @@ C_DEPS += \
 ./Src/control.d \
 ./Src/dma.d \
 ./Src/gpio.d \
+./Src/hook.d \
 ./Src/main.d \
 ./Src/power.d \
 ./Src/steering.d \
@@ -69,7 +72,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/FLASH_PAGE_F1.d ./Src/FLASH_PAGE_F1.o ./Src/FLASH_PAGE_F1.su ./Src/adc.d ./Src/adc.o ./Src/adc.su ./Src/calibrate.d ./Src/calibrate.o ./Src/calibrate.su ./Src/can.d ./Src/can.o ./Src/can.su ./Src/control.d ./Src/control.o ./Src/control.su ./Src/dma.d ./Src/dma.o ./Src/dma.su ./Src/gpio.d ./Src/gpio.o ./Src/gpio.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/power.d ./Src/power.o ./Src/power.su ./Src/steering.d ./Src/steering.o ./Src/steering.su ./Src/stm32f1xx_hal_msp.d ./Src/stm32f1xx_hal_msp.o ./Src/stm32f1xx_hal_msp.su ./Src/stm32f1xx_it.d ./Src/stm32f1xx_it.o ./Src/stm32f1xx_it.su ./Src/system_stm32f1xx.d ./Src/system_stm32f1xx.o ./Src/system_stm32f1xx.su ./Src/tim.d ./Src/tim.o ./Src/tim.su ./Src/timer.d ./Src/timer.o ./Src/timer.su ./Src/usart.d ./Src/usart.o ./Src/usart.su ./Src/wheels.d ./Src/wheels.o ./Src/wheels.su
+	-$(RM) ./Src/FLASH_PAGE_F1.d ./Src/FLASH_PAGE_F1.o ./Src/FLASH_PAGE_F1.su ./Src/adc.d ./Src/adc.o ./Src/adc.su ./Src/calibrate.d ./Src/calibrate.o ./Src/calibrate.su ./Src/can.d ./Src/can.o ./Src/can.su ./Src/control.d ./Src/control.o ./Src/control.su ./Src/dma.d ./Src/dma.o ./Src/dma.su ./Src/gpio.d ./Src/gpio.o ./Src/gpio.su ./Src/hook.d ./Src/hook.o ./Src/hook.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/power.d ./Src/power.o ./Src/power.su ./Src/steering.d ./Src/steering.o ./Src/steering.su ./Src/stm32f1xx_hal_msp.d ./Src/stm32f1xx_hal_msp.o ./Src/stm32f1xx_hal_msp.su ./Src/stm32f1xx_it.d ./Src/stm32f1xx_it.o ./Src/stm32f1xx_it.su ./Src/system_stm32f1xx.d ./Src/system_stm32f1xx.o ./Src/system_stm32f1xx.su ./Src/tim.d ./Src/tim.o ./Src/tim.su ./Src/timer.d ./Src/timer.o ./Src/timer.su ./Src/usart.d ./Src/usart.o ./Src/usart.su ./Src/wheels.d ./Src/wheels.o ./Src/wheels.su
 
 .PHONY: clean-Src
 

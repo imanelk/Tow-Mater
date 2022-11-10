@@ -12,6 +12,7 @@
 #include "interfaces/msg/motors_order.hpp"
 #include "interfaces/msg/steering_calibration.hpp"
 #include "interfaces/msg/system_check.hpp"
+#include "interfaces/msg/hook.hpp"
 
 #include "../include/can/can.h"
 
@@ -33,6 +34,9 @@ public:
 
       subscription_system_check_ = this->create_subscription<interfaces::msg::SystemCheck>(
       "system_check", 10, std::bind(&can_tx::sendCommunicationRequestCallback, this, _1));
+
+      subscription_hook_ = this->create_subscription<interfaces::msg::Hook>(
+      "hook", 10, std::bind(&can_tx::hookLockingOrderCallback, this, _1));
 
       RCLCPP_INFO(this->get_logger(), "Ready to transmit");
     }
@@ -124,6 +128,29 @@ private:
       return 0;
     }
 
+    /* Send hook locking order [callback function]
+    * This function is called when a message is published on the "/hook" topic
+    */
+    int hookLockingOrderCallback(const interfaces::msg::Hook & hookMsg) {
+
+      if (hookMsg.type == "lock" && hookMsg.status == true){
+        
+        frame.can_id = ID_HOOK;
+        frame.data[0] = HOOK_LOCK;
+    
+        return canSend(frame);
+
+      }else if (hookMsg.type == "lock" && hookMsg.status == false){
+        
+        frame.can_id = ID_HOOK;
+        frame.data[0] = HOOK_UNLOCK;
+    
+        return canSend(frame);
+      }
+      return 0;
+    }
+    
+
     //Sends frame via CAN bus
     int canSend(struct can_frame frame){
 
@@ -147,6 +174,7 @@ private:
     rclcpp::Subscription<interfaces::msg::MotorsOrder>::SharedPtr subscription_motors_order_;
     rclcpp::Subscription<interfaces::msg::SteeringCalibration>::SharedPtr subscription_steering_calibration_;
     rclcpp::Subscription<interfaces::msg::SystemCheck>::SharedPtr subscription_system_check_;
+    rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
 };
 
 

@@ -60,8 +60,8 @@ all: main-build
 main-build: F103.elf secondary-outputs
 
 # Tool invocations
-F103.elf F103.map: $(OBJS) $(USER_OBJS) /home/adminlocal/Desktop/ws_F103/F103_US/firmware/STM32F103RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "F103.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/adminlocal/Desktop/ws_F103/F103_US/firmware/STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="F103.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+F103.elf F103.map: $(OBJS) $(USER_OBJS) C:\Users\apier\OneDrive\Bureau\f103_hook_US-Optimization\nucleoF103\firmware\STM32F103RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "F103.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\apier\OneDrive\Bureau\f103_hook_US-Optimization\nucleoF103\firmware\STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="F103.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
