@@ -16,7 +16,7 @@
 
 #define FINAL_REVERSE_VELOCITY -0.8 // [m/s]
 
-#define LOCK_DISTANCE 7    // Lock distance (between US rear center and the damaged car) [cm]
+#define LOCK_DISTANCE 26    // Lock distance (between US rear center and the damaged car) [cm]
 #define LOCK_WAITING_TIME 4 //Waiting time after the lock order [s]
 
 #define TOWING_VELOCITY 1.0 // [m/s]

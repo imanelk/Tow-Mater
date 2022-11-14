@@ -42,6 +42,8 @@ public:
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER);
+
+        unlockHook();
  
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
@@ -159,14 +161,14 @@ private:
     /* Publish the hook locking order on the /hook topic
     *
     */
-    void lockHook(){
+    void unlockHook(){
         auto hookMsg = interfaces::msg::Hook();
 
         hookMsg.type = "lock";
         hookMsg.status = true;
         publisher_cmd_hook_->publish(hookMsg);
 
-        RCLCPP_INFO(this->get_logger(), "Hook Locking");
+        RCLCPP_INFO(this->get_logger(), "Hook unlocking");
         sleep(LOCK_WAITING_TIME);
 
         hookLocked = true;
@@ -177,14 +179,14 @@ private:
     /* Publish the hook unlocking order on the /hook topic
     *
     */
-    void unlockHook(){
+    void lockHook(){
         auto hookMsg = interfaces::msg::Hook();
 
         hookMsg.type = "lock";
         hookMsg.status = false;
         publisher_cmd_hook_->publish(hookMsg);
 
-        RCLCPP_INFO(this->get_logger(), "Hook Unlocking");
+        RCLCPP_INFO(this->get_logger(), "Hook locking");
         sleep(LOCK_WAITING_TIME);
 
         hookLocked = false;
