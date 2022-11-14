@@ -42,6 +42,9 @@ public:
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER);
+
+        sleep(2);
+        unlockHook();
  
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
@@ -57,7 +60,7 @@ private:
     */
     void hookCallback(const interfaces::msg::Hook & hookMsg) {
 
-        if (hookMsg.type == "detect"){
+        if (hookMsg.type == "detect" && !hookDetected){
            hookDetected = hookMsg.status;
 
         } else if (hookMsg.type == "fdc")
@@ -233,7 +236,6 @@ private:
                 }
 
             } else{
-                unlockHook();
                 sendVel(FINAL_REVERSE_VELOCITY);
             }
 
