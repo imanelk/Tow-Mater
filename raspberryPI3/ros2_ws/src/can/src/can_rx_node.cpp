@@ -18,6 +18,7 @@
 #include "interfaces/msg/ultrasonic.hpp"
 #include "interfaces/msg/gnss.hpp"
 #include "interfaces/msg/system_check.hpp"
+#include "interfaces/msg/hook.hpp"
 
 #include "../include/can/can.h"
 
@@ -37,6 +38,8 @@ public:
         publisher_generalData_ = this->create_publisher<interfaces::msg::GeneralData>("general_data", 10);
         publisher_steeringCalibration_ = this->create_publisher<interfaces::msg::SteeringCalibration>("steering_calibration", 10);
         publisher_systemCheck_ = this->create_publisher<interfaces::msg::SystemCheck>("system_check", 10);
+        publisher_hook_ = this->create_publisher<interfaces::msg::Hook>("hook", 10);
+
 
 
         if (initCommunication()==0){
@@ -336,6 +339,17 @@ private:
                 generalDataMsg.humidity= humidity;
 
                 publisher_generalData_->publish(generalDataMsg);
+
+
+            }  else if (frame.can_id == ID_HOOK && frame.data[0] == 0x2){  
+                RCLCPP_DEBUG(this->get_logger(), "Publishing to /hook Topic");
+
+                auto hookMsg = interfaces::msg::Hook();
+
+                hookMsg.type = "fdc";
+                hookMsg.status = true;
+
+                publisher_hook_->publish(hookMsg);
             }
 
         }
@@ -395,6 +409,7 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::MagneticField>::SharedPtr publisher_imu_mag_;
 
     rclcpp::Publisher<interfaces::msg::SystemCheck>::SharedPtr publisher_systemCheck_;
+    rclcpp::Publisher<interfaces::msg::Hook>::SharedPtr publisher_hook_;
     
 };
 
