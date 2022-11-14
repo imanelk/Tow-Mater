@@ -88,7 +88,7 @@ class Vision(Node):
         img = self.bridge.imgmsg_to_cv2(imgMsg, desired_encoding='passthrough')
         
         # Mask of purple color
-        image = cv2.inRange(img, (0, 95, 169), (0, 119, 169))
+        image = cv2.inRange(img, (50, 0, 50), (255, 50, 255))
         
         ## Image processing 
         resized = imutils.resize(image, width=300) #redimensionnement
