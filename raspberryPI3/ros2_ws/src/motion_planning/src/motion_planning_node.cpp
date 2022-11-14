@@ -171,7 +171,7 @@ private:
         RCLCPP_INFO(this->get_logger(), "Hook unlocking");
         sleep(LOCK_WAITING_TIME);
 
-        hookLocked = true;
+        hookLocked = false;
         
     }
 
@@ -189,7 +189,7 @@ private:
         RCLCPP_INFO(this->get_logger(), "Hook locking");
         sleep(LOCK_WAITING_TIME);
 
-        hookLocked = false;
+        hookLocked = true;
         
     }
 
