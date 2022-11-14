@@ -54,11 +54,11 @@ class Vision(Node):
         img = self.bridge.imgmsg_to_cv2(imgMsg, desired_encoding='passthrough')
         
         
-        lower_red = np.array([0, 0, 50], dtype = "uint8") 
+        #lower_red = np.array([0, 0, 50], dtype = "uint8") 
 
-        upper_red= np.array([50, 50, 255], dtype = "uint8")
+        #upper_red= np.array([50, 50, 255], dtype = "uint8")
 
-        mask = cv2.inRange(img, lower_red, upper_red)
+        mask = cv2.inRange(img, (0, 0, 50), (50, 50, 255))
 
         detect = np.sum(mask)
 
