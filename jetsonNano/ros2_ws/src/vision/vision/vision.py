@@ -60,7 +60,7 @@ class Vision(Node):
 
         mask = cv2.inRange(img, lower_red, upper_red)
 
-        detect = np.sum(mask)
+        detect = np.mean(mask)
 
         if detect > 0:
             hookDetected = True
