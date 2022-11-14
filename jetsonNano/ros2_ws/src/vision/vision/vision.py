@@ -64,9 +64,11 @@ class Vision(Node):
 
         if detect > 0:
             hookDetected = True
+            print("Hook found")
             
         else:
             hookDetected = False
+            print("None Hook")
 
 
         # Publication on the /hook topic
