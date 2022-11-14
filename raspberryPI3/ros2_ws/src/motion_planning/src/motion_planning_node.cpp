@@ -42,8 +42,6 @@ public:
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER);
-
-        unlockHook();
  
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
@@ -61,7 +59,9 @@ private:
 
         if (hookMsg.type == "detect"){
            hookDetected = hookMsg.status;
-        }
+
+        } else if (hookMsg.type == "fdc")
+            hookFdc = hookMsg.status;
         
     }
 
@@ -217,7 +217,7 @@ private:
                     sendVel(0.0);
                     finalReverse = false;
               
-                }else if (areaStatus[4] > LOCK_DISTANCE){     //Hook detected => Slow movement until locking distance is reached
+                }else if (!hookFdc){     //Hook detected => Slow movement until locking distance is reached
                     safeMode = false;
                     sendVel(0.5*FINAL_REVERSE_VELOCITY);
 
@@ -233,6 +233,7 @@ private:
                 }
 
             } else{
+                unlockHook();
                 sendVel(FINAL_REVERSE_VELOCITY);
             }
 
@@ -263,7 +264,7 @@ private:
     }
     
     // ---- Private variables ----
-    bool hookDetected, hookLocked = false;
+    bool hookDetected, hookLocked, hookFdc = false;
 
     //Steps
     bool finalReverse = false;
