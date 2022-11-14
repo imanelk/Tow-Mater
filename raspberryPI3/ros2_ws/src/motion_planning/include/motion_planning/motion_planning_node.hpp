@@ -20,7 +20,7 @@
 #define LOCK_WAITING_TIME 4 //Waiting time after the lock order [s]
 
 #define TOWING_VELOCITY 1.0 // [m/s]
-#define TOWING_DURATION 10000ms
+#define TOWING_DURATION 10000ms 
  
 
 #endif /*__motion_planning_node_HPP */
