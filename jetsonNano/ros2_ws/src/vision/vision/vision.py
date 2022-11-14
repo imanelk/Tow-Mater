@@ -58,13 +58,12 @@ class Vision(Node):
 
         upper_red= np.array([50, 50, 255], dtype = "uint8")
 
-        mask = cv2.inRange(img, lower_red, upper_red=)
+        mask = cv2.inRange(img, lower_red, upper_red)
 
         detect = np.sum(mask)
 
         if detect > 0:
             hookDetected = True
-            print("Hook ")
             
         else:
             hookDetected = False
