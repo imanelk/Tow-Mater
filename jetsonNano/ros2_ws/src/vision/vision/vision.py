@@ -125,10 +125,10 @@ class Vision(Node):
             c *= ratio
             c = c.astype("int")
                         # Publication on the /hook topic
-                msgHook = Hook()
-                msgHook.type = 'detect'
-                msgHook.status = True
-                self.publisher_hook_.publish(msgHook)
+            msgHook = Hook()
+            msgHook.type = 'detect'
+            msgHook.status = True
+            self.publisher_hook_.publish(msgHook)
         
 
 
