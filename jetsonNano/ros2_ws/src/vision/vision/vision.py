@@ -116,21 +116,22 @@ class Vision(Node):
             shape = sd.detect(c)
             
             if (shape == "circle"): 
-                hookDetected = True
                 self.get_logger().info('Hook detected')
-            else: hookDetected = False
+                # Publication on the /hook topic
+                msgHook = Hook()
+                msgHook.type = 'detect'
+                msgHook.status = True
+                self.publisher_hook_.publish(msgHook)
+                exit()
+
             # resize the contour
             c = c.astype("float")
             c *= ratio
             c = c.astype("int")
+        
 
 
-        # Publication on the /hook topic
-        msgHook = Hook()
-        msgHook.type = 'detect'
-        msgHook.status = hookDetected
-
-        self.publisher_hook_.publish(msgHook)
+        
 
 
   
