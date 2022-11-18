@@ -95,7 +95,7 @@ class Vision(Node):
         ratio = image.shape[0] / float(resized.shape[0])
         
         # convert the resized image to blur it slightly,
-        # and threshold it
+        # and threshold it 
 
         blurred = cv2.GaussianBlur(image, (5, 5), 0)
         thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
