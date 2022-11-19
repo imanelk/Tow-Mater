@@ -77,6 +77,7 @@ extern CAN_HandleTypeDef hcan;
 
 #define HOOK_UNLOCK 0x0
 #define HOOK_LOCK 0x1
+#define HOOK_FDC 0x2
 
 /* USER CODE END Private defines */
 

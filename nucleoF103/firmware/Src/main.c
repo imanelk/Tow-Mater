@@ -117,6 +117,10 @@ int steeringSpeed = -1;
 //Communication checking request
 int commCheckingRequest = 0;
 
+//Hook
+int currentFDC = 0;
+int lastFDC = 0;
+
 extern CAN_HandleTypeDef hcan;
 
 /* USER CODE END PV */
@@ -301,6 +305,17 @@ int main(void)
     while (1)
     {
         /* USER CODE END WHILE */
+
+    	currentFDC = !(HAL_GPIO_ReadPin(GPIO_PORT_FDC_HOOK, GPIO_PIN_FDC_HOOK));
+
+		if (!lastFDC && currentFDC){	//Send hook_fdc at front edge
+			data[0] = 0x02;
+			CAN_Send(data, CAN_ID_HOOK);
+		}
+
+		lastFDC = currentFDC;
+
+
 
         /* USER CODE BEGIN 3 */
     	if (US_FLAG==1)

@@ -69,10 +69,16 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(US_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : GPIO_PIN_HOOK */
-	GPIO_InitStruct.Pin = GPIO_PIN_HOOK;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIO_PORT_HOOK, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = GPIO_PIN_HOOK;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIO_PORT_HOOK, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin */
+  GPIO_InitStruct.Pin = GPIO_PIN_FDC_HOOK;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIO_PORT_FDC_HOOK, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = LatchPower_Pin;
