@@ -27,9 +27,9 @@ On the Raspberry Pi the CAN uses the shield **PICAN 2**. This shield is designed
 ./candump can0
 ~~~~
 
-Main steps to config the Pican are :
+Main steps to config the Pican are:
 
-* Edit the file `/boot/firmware/config.txt` by:
+* Edit the file `/boot/firmware/config.txt` by :
 
 ~~~~
 sudo nano /boot/firmware/config.txt

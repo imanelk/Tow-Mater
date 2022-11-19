@@ -46,6 +46,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #include "main.h"
+#include "hook.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -56,6 +57,7 @@ extern CAN_HandleTypeDef hcan;
 /* USER CODE BEGIN Private defines */
 #define CAN_ID_MOTORS_DATA	0x200	// Odometry, Motors speed, Steering angle
 #define CAN_ID_MOTORS_CMD 	0x100	// Speed and Steering Commands
+#define CAN_ID_HOOK	0x111
 #define CAN_ID_US1	0x211			//Front US [cm]
 #define CAN_ID_US2	0x221			//Rear US [cm]
 #define CAN_ID_BATT_LEVEL	0x273	//Battery Level
@@ -72,6 +74,10 @@ extern CAN_HandleTypeDef hcan;
 
 #define COMM_CHECKING_REQUEST 0x1 //frame[0]
 #define COMM_CHECKING_ACK 0x1	  //frame[1]
+
+#define HOOK_UNLOCK 0x0
+#define HOOK_LOCK 0x1
+#define HOOK_FDC 0x2
 
 /* USER CODE END Private defines */
 

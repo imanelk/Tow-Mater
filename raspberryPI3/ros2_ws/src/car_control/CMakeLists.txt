@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(interfaces REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
 add_executable(car_control_node 
   src/car_control_node.cpp
@@ -19,7 +20,7 @@ add_executable(car_control_node
 )
 
 
-ament_target_dependencies(car_control_node rclcpp interfaces sensor_msgs std_srvs)
+ament_target_dependencies(car_control_node rclcpp interfaces sensor_msgs std_srvs nav_msgs)
 ament_export_include_directories(include)
 
 target_include_directories(car_control_node PUBLIC

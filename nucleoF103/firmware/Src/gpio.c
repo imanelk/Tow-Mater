@@ -9,8 +9,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
-/* USER CODE BEGIN 0 */
 
+/* USER CODE BEGIN 0 */
+#include "hook.h"
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
@@ -43,6 +44,8 @@ void MX_GPIO_Init(void)
                           |US_Rear_Center_Trig_Pin|US_Rear_Right_Trig_Pin|GPIO_PIN_10|GPIO_PIN_11
                           |GPIO_PIN_12, GPIO_PIN_RESET);
 
+  HAL_GPIO_WritePin(GPIO_PORT_HOOK, GPIO_PIN_HOOK, GPIO_PIN_RESET);
+
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LatchPower_GPIO_Port, LatchPower_Pin, GPIO_PIN_RESET);
 
@@ -64,6 +67,18 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(US_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : GPIO_PIN_HOOK */
+  GPIO_InitStruct.Pin = GPIO_PIN_HOOK;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIO_PORT_HOOK, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin */
+  GPIO_InitStruct.Pin = GPIO_PIN_FDC_HOOK;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIO_PORT_FDC_HOOK, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = LatchPower_Pin;

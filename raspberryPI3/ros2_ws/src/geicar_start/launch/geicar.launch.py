@@ -35,7 +35,18 @@ def generate_launch_description():
         executable="car_control_node",
         emulate_tty=True
     )
-
+    
+    motion_planning_node = Node(
+        package="motion_planning",
+        executable="motion_planning_node",
+        emulate_tty=True
+    )
+    
+    obstacle_detection_node = Node(
+        package="obstacle_detection",
+        executable="obstacle_detection_node",
+        emulate_tty=True
+    )
 
     config_dir = os.path.join(get_package_share_directory('imu_filter_madgwick'), 'config')
 
@@ -46,13 +57,11 @@ def generate_launch_description():
         emulate_tty=True
     )
 
-
     system_check_node = Node(
         package="system_check",
         executable="system_check_node",
         emulate_tty=True
     )
-
 
     ld.add_action(joystick_node)
     ld.add_action(joystick_to_cmd_node)
@@ -60,6 +69,9 @@ def generate_launch_description():
     ld.add_action(can_tx_node)
     ld.add_action(car_control_node)
     ld.add_action(imu_filter_madgwick_node)
+    ld.add_action(motion_planning_node)
+    ld.add_action(obstacle_detection_node)
+    
     ld.add_action(system_check_node)
 
     return ld
