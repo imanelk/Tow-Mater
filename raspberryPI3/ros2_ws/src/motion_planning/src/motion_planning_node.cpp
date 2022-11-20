@@ -7,6 +7,7 @@
 #include "interfaces/msg/cmd_steer.hpp"
 #include "interfaces/msg/hook.hpp"
 #include "interfaces/msg/obstacles.hpp"
+#include "interfaces/msg/distance.hpp"
 
 using namespace std;
 using placeholders::_1;
@@ -21,10 +22,22 @@ public:
         safeMode = true;
         currentVelocity = -1; 
         currentSteer = -1, 
-        finalReverse = true;
+        noUTurn = true;
+
+        nutTraj[0].velocity = 0.8;
+        nutTraj[0].angle = 1.0;
+        nutTraj[0].distance = 234.0; 
+
+        nutTraj[1].velocity = 0.8;
+        nutTraj[1].angle = -1.0;
+        nutTraj[1].distance = 234.0;
+
+        nutTraj[2].velocity = 0.0;
+        nutTraj[2].angle = 0.0;
+        nutTraj[2].distance = 0.0;
 
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
-        publisher_cmd_steer_= this->create_publisher<interfaces::msg::CmdSteer>("cmd/steer", 10);
+        publisher_cmd_steer_= this->create_publisher<interfaces::msg::CmdSteer>("consign_steer", 10);
         publisher_cmd_hook_= this->create_publisher<interfaces::msg::Hook>("hook", 10);
 
        
@@ -33,7 +46,11 @@ public:
         "hook", 10, std::bind(&motion_planning::hookCallback, this, _1));
 
         subscription_obstacles_ = this->create_subscription<interfaces::msg::Obstacles>(
-        "obstacle", 10, std::bind(&motion_planning::obstaclesFeedback, this, _1));
+        "obstacle", 10, std::bind(&motion_planning::obstaclesCallback, this, _1));
+
+        subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
+        "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
+
 
 
         timer_security_ = this->create_wall_timer(PERIOD_CHECK_SECURITY, std::bind(&motion_planning::checkSecurity, this));
@@ -42,9 +59,6 @@ public:
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER);
-
-        sleep(2);
-        unlockHook();
  
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
@@ -73,7 +87,7 @@ private:
     * This function is called when a message is published on the "/obstacles" topic
     * 
     */
-    void obstaclesFeedback(const interfaces::msg::Obstacles & obstaclesMsg){
+    void obstaclesCallback(const interfaces::msg::Obstacles & obstaclesMsg){
 
         if (obstaclesReceived != 1){
             RCLCPP_WARN(this->get_logger(),"Obstacle analysis received [OK]");
@@ -82,6 +96,16 @@ private:
 
         for (int i=0 ; i<6 ; i++)
             areaStatus[i] = obstaclesMsg.area[i];
+    }
+
+    /* Update distance from distance topic [callback function]  :
+    *
+    * This function is called when a message is published on the "/distance" topic
+    * 
+    */
+    void distanceCallback(const interfaces::msg::Distance & distanceMsg){
+
+        currentDistance += distanceMsg.last;
     }
 
 
@@ -208,7 +232,35 @@ private:
             return;
         }
 
-        if (finalReverse){
+        if (noUTurn){
+
+
+            if (currentPoint < NB_NUT_POINTS){
+                sendVel(nutTraj[currentPoint].velocity);
+                sendSteer(nutTraj[currentPoint].angle);
+            }
+
+            else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
+                currentDistance = 0;
+                currentPoint = 0;
+                noUTurn = false;
+
+                sleep(2);
+                RCLCPP_WARN(this->get_logger(),"Start of the reversing process");
+                reversing = true;
+                return ;
+            }
+
+            if (currentDistance >= nutTraj[currentPoint].distance){
+                currentDistance = 0;
+                RCLCPP_INFO(this->get_logger(),"Next Point");
+                currentPoint++;
+            }
+            
+            
+        }
+
+        else if (reversing){
     
             sendSteer(0.0);
 
@@ -218,9 +270,10 @@ private:
                     RCLCPP_ERROR(this->get_logger(),"Inconsistent events : Hook detected but no obstacle detected");
                     RCLCPP_ERROR(this->get_logger(),"Final reverse - FAILED");
                     sendVel(0.0);
-                    finalReverse = false;
+                    reversing = false;
               
                 }else if (!hookFdc){     //Hook detected => Slow movement until locking distance is reached
+                    unlockHook();
                     safeMode = false;
                     sendVel(0.5*FINAL_REVERSE_VELOCITY);
 
@@ -229,7 +282,7 @@ private:
                     sleep(2);
                     lockHook();
                     safeMode = true;
-                    finalReverse = false;
+                    reversing = false;
 
                     RCLCPP_WARN(this->get_logger(),"Start of the towing process");
                     towing = true;
@@ -268,9 +321,22 @@ private:
     // ---- Private variables ----
     bool hookDetected, hookLocked, hookFdc = false;
 
-    //Steps
-    bool finalReverse = false;
+    //States
+    bool noUTurn = false;
+    bool reversing = false;
     bool towing = false;
+
+    //Trajectories
+    struct VAD_POINT {
+        float velocity;
+        float angle;
+        float distance;
+    };
+
+    int currentPoint = 0;
+    float currentDistance = 0.0; //Distance measurement [cm]
+
+    VAD_POINT nutTraj[NB_NUT_POINTS];
 
     //Security
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
@@ -291,6 +357,7 @@ private:
     //Subscribers
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
+    rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
 
     //Timers
     rclcpp::TimerBase::SharedPtr timer_security_;

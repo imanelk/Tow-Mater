@@ -21,6 +21,12 @@
 
 #define TOWING_VELOCITY 1.0 // [m/s] 
 #define TOWING_DURATION 10000ms 
+
+// ---- Trajectories
+
+// No U-turn (NUT)
+
+#define NB_NUT_POINTS 3
  
 
 #endif /*__motion_planning_node_HPP */
