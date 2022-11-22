@@ -55,7 +55,7 @@ class Vision(Node):
 
         if info is not None :
             hookDetected = True
-            self.get_logger().info('Hook detected', info)
+            self.get_logger().info('Hook detected')
         # if box_coordinates is None:
             # print('No Code')
             #hookDetected = False
