@@ -54,10 +54,10 @@ class Vision(Node):
         info, box_coordinates, _ = det.detectAndDecode(img)
 
         if box_coordinates is None:
-            print('No Code')
+            # print('No Code')
             hookDetected = False
         else:
-            print("Côté détecté = ", info)
+            # print("Côté détecté = ", info)
             hookDetected = True
 
         # tracer les contours du qr code sur l'image
@@ -79,6 +79,12 @@ class Vision(Node):
         # print("width of qr  = ", width_qr)
  
         #cv2.imshow('Output', img) #print l'image avec le QRcode encadré
+        msgHook=Hook()
+        msgHook.type = 'Detect'
+        msgHook.status = hookDetected
+
+        self.publisher_hook_.publish(msgHook)
+        
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
