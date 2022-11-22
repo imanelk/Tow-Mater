@@ -53,9 +53,12 @@ class Vision(Node):
         det = cv2.QRCodeDetector()
         info, box_coordinates, _ = det.detectAndDecode(img)
 
-        if info is not None :
+        if info == "avant" or info == "arriere":
             hookDetected = True
-            self.get_logger().info('Hook detected')
+            self.get_logger().info('QR code detected')
+        elif info is not None:
+            self.get_logger().info('Detection')
+
         # if box_coordinates is None:
             # print('No Code')
             #hookDetected = False
