@@ -67,16 +67,16 @@ class Vision(Node):
 #            for i in range(n):
 #                cv2.line(img, tuple(box_coordinates[0][i]), tuple(box_coordinates[0][(i+1) % n]), (0,255,0), 3)
 
-        x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
-        y_coordinates = [(box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)]
-        middle_coordinates = [x_coordinates, y_coordinates]
-        width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
+        # x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
+        # y_coordinates = [(box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)]
+        # middle_coordinates = [x_coordinates, y_coordinates]
+        # width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
 
-        print("box coordinates = ", box_coordinates[0])
-        print(" ")
-        print("middle coordinates = ", middle_coordinates)
-        print(" ")
-        print("width of qr  = ", width_qr)
+        # print("box coordinates = ", box_coordinates[0])
+        # print(" ")
+        # print("middle coordinates = ", middle_coordinates)
+        # print(" ")
+        # print("width of qr  = ", width_qr)
  
         #cv2.imshow('Output', img) #print l'image avec le QRcode encadré
         cv2.waitKey(0)
