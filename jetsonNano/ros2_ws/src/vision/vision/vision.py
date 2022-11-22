@@ -53,13 +53,16 @@ class Vision(Node):
         det = cv2.QRCodeDetector()
         info, box_coordinates, _ = det.detectAndDecode(img)
 
-        if box_coordinates is None:
-            # print('No Code')
-            hookDetected = False
-        else:
-            # print("Côté détecté = ", info)
+        if info is not None :
             hookDetected = True
-            self.get_logger().info('Hook detected')
+            self.get_logger().info('Hook detected', info)
+        # if box_coordinates is None:
+            # print('No Code')
+            #hookDetected = False
+        #else:
+            # print("Côté détecté = ", info)
+            # hookDetected = True
+            # self.get_logger().info('Hook detected')
 
         # tracer les contours du qr code sur l'image
 #        if box_coordinates is not None:
