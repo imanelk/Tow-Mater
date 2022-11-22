@@ -59,6 +59,7 @@ class Vision(Node):
         else:
             # print("Côté détecté = ", info)
             hookDetected = True
+            self.get_logger().info('Hook detected')
 
         # tracer les contours du qr code sur l'image
 #        if box_coordinates is not None:
