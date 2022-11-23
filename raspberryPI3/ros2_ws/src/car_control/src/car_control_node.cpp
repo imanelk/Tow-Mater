@@ -80,7 +80,7 @@ private:
 
     /* Update start, mode, requestedThrottle, requestedSteerAngle and reverse from joystick order [callback function]  :
     *
-    * This function is called when a message is published on the "/joystick_order" topic
+    *  This function is called when a message is published on the "/joystick_order" topic
     * 
     */
     void joystickOrderCallback(const interfaces::msg::JoystickOrder & joyOrder) {

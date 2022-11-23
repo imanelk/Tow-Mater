@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "usb_cam/usb_cam_node.hpp"
+#include "../include/usb_cam/usb_cam_node.hpp"
 
 #include <sstream>
 // #include <std_srvs/srv/Empty.h>
