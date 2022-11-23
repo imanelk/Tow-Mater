@@ -154,8 +154,10 @@ private:
     //Sends frame via CAN bus
     int canSend(struct can_frame frame){
 
-      if (write(s, &frame, sizeof(struct can_frame)) != sizeof(struct can_frame)) {
-        RCLCPP_ERROR(this->get_logger(), "Sending fail, can ID 0x%03X", frame.can_id);
+      int writeResult = write(s, &frame, sizeof(struct can_frame)) ;
+
+      if (writeResult != sizeof(struct can_frame)) {
+        RCLCPP_ERROR(this->get_logger(), "Sending fail, can ID 0x%03X, error : %d", frame.can_id, writeResult);
         return 1;
       }
 
