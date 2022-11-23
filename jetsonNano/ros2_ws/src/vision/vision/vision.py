@@ -55,7 +55,7 @@ class Vision(Node):
 
         if info == "avant" or info == "arrière":
             hookDetected = True
-            self.get_logger().info('QR code detected')
+            #self.get_logger().info('QR code detected')
 
         # if hookDetected === True:
         #     x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
