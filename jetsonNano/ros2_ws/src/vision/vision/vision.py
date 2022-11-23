@@ -86,7 +86,7 @@ class Vision(Node):
  
         #cv2.imshow('Output', img) #print l'image avec le QRcode encadré
         
-        smsgHook=Hook()
+        msgHook=Hook()
         msgHook.type = 'Detect'
         msgHook.status = hookDetected
 
