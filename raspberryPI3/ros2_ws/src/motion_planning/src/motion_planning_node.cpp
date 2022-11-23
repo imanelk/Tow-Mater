@@ -19,18 +19,16 @@ public:
     motion_planning()
     : Node("motion_planning_node")
     {
-        safeMode = true;
         currentVelocity = -1; 
-        currentSteer = -1, 
-        noUTurn = true;
+        currentSteer = -1;
 
         nutTraj[0].velocity = 0.8;
         nutTraj[0].angle = 1.0;
-        nutTraj[0].distance = 234.0; 
+        nutTraj[0].distance = 190.0; 
 
         nutTraj[1].velocity = 0.8;
         nutTraj[1].angle = -1.0;
-        nutTraj[1].distance = 234.0;
+        nutTraj[1].distance = 190.0;
 
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
@@ -53,14 +51,17 @@ public:
 
 
 
-        timer_security_ = this->create_wall_timer(PERIOD_CHECK_SECURITY, std::bind(&motion_planning::checkSecurity, this));
-
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
+ 
+        sleep(2);   //Waiting for car_control to start
+        RCLCPP_INFO(this->get_logger(), "motion_planning_node v2 READY");
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER);
- 
-        RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
+
+        noUturn = true;
+        RCLCPP_WARN(this->get_logger(), "NO U-TURN");
+
 
     }
 
@@ -76,6 +77,7 @@ private:
 
         if (hookMsg.type == "detect" && !hookDetected){
            hookDetected = hookMsg.status;
+           hookDistance = 40.0;
 
         } else if (hookMsg.type == "fdc")
             hookFdc = hookMsg.status;
@@ -89,13 +91,38 @@ private:
     */
     void obstaclesCallback(const interfaces::msg::Obstacles & obstaclesMsg){
 
+        vector<int> frontObstacles;
+        vector<int> rearObstacles;
+
         if (obstaclesReceived != 1){
             RCLCPP_WARN(this->get_logger(),"Obstacle analysis received [OK]");
             obstaclesReceived = 1;
         }
 
-        for (int i=0 ; i<6 ; i++)
-            areaStatus[i] = obstaclesMsg.area[i];
+        //Front obstacles
+        for (int i=0;i<3;i++){
+            if (obstaclesMsg.area[i] != -1)
+                frontObstacles.push_back(obstaclesMsg.area[i]);
+        }
+
+        if (frontObstacles.size() == 0)
+            frontObstacleDistance = -1;
+        else
+            frontObstacleDistance = *std::min_element(frontObstacles.begin(),frontObstacles.end());
+        
+
+        //Rear obstacles
+        for (int i=3;i<6;i++){
+            if (obstaclesMsg.area[i] != -1)
+                rearObstacles.push_back(obstaclesMsg.area[i]);
+        }
+
+        if (rearObstacles.size() == 0)
+            rearObstacleDistance = -1;
+        else{
+            rearObstacleDistance = *std::min_element(rearObstacles.begin(),rearObstacles.end());
+        }
+        
     }
 
     /* Update distance from distance topic [callback function]  :
@@ -105,53 +132,17 @@ private:
     */
     void distanceCallback(const interfaces::msg::Distance & distanceMsg){
 
-        currentDistance += distanceMsg.last;
+        distanceTravelled += distanceMsg.last;
     }
 
 
-    /* Stops the car if the movement is not safe (obstacle detected) */
-    bool checkSecurity(){
-
-        if (!safe(currentVelocity)){
-            sendVel(0.0);
-            return false;
-        } else
-            return true;
-
-    }
-
-
-    /* Checks if the movement is safe (depends on speed and obstacles)
-    * returns "true" if safe
-    */
-    bool safe(float velocity){
-
-        if (velocity == 0 || !safeMode)
-            return true;        //not moving => safe
-
-        if (obstaclesReceived !=1) //If the obstacle analysis has not yet been received on the /obstacles topic
-            return false;
-
-
-        //If the car is moving, check the corresponding areas
-        if ((velocity > 0) && (areaStatus[0] == -1 && areaStatus[1] == -1 && areaStatus[2] == -1))   //check the front areas
-            return true;
-
-        else if ((velocity < 0) && (areaStatus[3] == -1 && areaStatus[4] == -1 && areaStatus[5] == -1))   //check the rear areas
-            return true;
-
-        else{
-            RCLCPP_DEBUG(this->get_logger(), "Movement not safe");
-            return false;
-        }
-    }
-
+    
     /* Publish the velocity on the /cmd/vel topic
     * If the velocity is not safe or if the velocity is the same as the current one : the velocity is not published
     */
     void sendVel(float velocity){
 
-        if (safe(velocity) && (currentVelocity != velocity)){
+        if (currentVelocity != velocity){
 
             auto cmdVelMsg = interfaces::msg::CmdVel();
             cmdVelMsg.velocity = velocity;
@@ -160,7 +151,7 @@ private:
             publisher_cmd_vel_->publish(cmdVelMsg);
 
             currentVelocity = velocity;
-            RCLCPP_DEBUG(this->get_logger(), "Send velocity : %f m/s",velocity);
+            RCLCPP_INFO(this->get_logger(), "VELOCITY : %.2f m/s",currentVelocity);
 
         } 
         
@@ -181,6 +172,7 @@ private:
             publisher_cmd_steer_->publish(cmdSteerMsg);
 
             currentSteer = angle;
+            RCLCPP_INFO(this->get_logger(), "STEERING : %.2f ",currentSteer);
         }
         
     }
@@ -220,113 +212,200 @@ private:
         
     }
 
-    /*  Manages the movements of the car: Decision-making entity  */
-    void motionPlanning(){
 
-        if (obstaclesReceived != 1){  
+    void motionPlanning(){   //Periodic
 
-            if (obstaclesReceived != -1){    //To print the message once
-                RCLCPP_WARN(this->get_logger(),"Obstacle analysis not received [waiting]");
-                obstaclesReceived = -1;
+        if (obstaclesReceived <= 0){
+            
+            sendVel(0.0);
+            sendSteer(0.0);
+            if (obstaclesReceived == 0){
+                obstaclesReceived = -1;    //To print the message once
+                RCLCPP_INFO(this->get_logger(), "Waiting for obstacle analysis");
             }
+            
             return;
         }
 
-        if (noUTurn){
+        //Transitions
+        if (!emergency && lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >=0) && (frontObstacleDistance <= LLS_DISTANCE)){
+            emergency = true;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
 
+        } else if (!emergency && lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >=0) && (rearObstacleDistance <= LLS_DISTANCE)){
+            emergency = true;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+        }
+        
+        else if (!emergency && !lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance != -1)){
+            emergency = true;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+        }
+
+        else if (!emergency && !lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance != -1)){
+            emergency = true;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+        }
+        
+        
+        if(emergency && lowLevelSecurity && (targetVelocity > 0) && ((frontObstacleDistance==-1) || (frontObstacleDistance > LLS_DISTANCE))){
+            emergency = false;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
+
+        }else if (emergency && lowLevelSecurity && (targetVelocity < 0) && ((rearObstacleDistance==-1) || (rearObstacleDistance > LLS_DISTANCE))){
+            emergency = false;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
+        }
+
+        else if (emergency && !lowLevelSecurity && (targetVelocity > 0) && (frontObstacleDistance == -1)){
+            emergency = false;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
+        }
+
+        else if (emergency && !lowLevelSecurity && (targetVelocity < 0) && (rearObstacleDistance == -1)){
+            emergency = false;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
+        }
+
+        else if (emergency && reverse && !lowLevelSecurity && hookDetected){
+            emergency = false;
+            RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
+        }
+
+        if (noUturn && noUturnEnd){
+            noUturn = false;
+            reverse = true;
+            RCLCPP_WARN(this->get_logger(), "REVERSE");
+        }
+
+        if (reverse && reverseEnd && hookLocked){
+            reverse = false;
+            tow = true;
+            lowLevelSecurity = false;
+            distanceTravelled = 0.0;
+
+            RCLCPP_WARN(this->get_logger(), "TOW");
+        }
+
+        if (reverse && reverseError){
+            RCLCPP_ERROR(this->get_logger(), "REVERSE [ERROR]");
+            reverse = false;
+            idle = true;
+        }
+
+        if (tow && towingEnd){
+            tow = false;
+            idle = true;
+            RCLCPP_WARN(this->get_logger(), "IDLE");
+        }
+
+        //States
+        if (manual){
+            return;
+
+        } else if (idle){
+
+            targetVelocity = 0.0;
+            sendVel(targetVelocity);
+            if (hookLocked)
+                unlockHook();        
+        }
+
+        else if (emergency){ 
+
+            sendVel(0.0);
+
+        
+        }else if (avoidance){
+            //...
+        
+        }else if (noUturn){
 
             if (currentPoint < NB_NUT_POINTS){
-                sendVel(nutTraj[currentPoint].velocity);
+                targetVelocity = nutTraj[currentPoint].velocity;
+                sendVel(targetVelocity);
                 sendSteer(nutTraj[currentPoint].angle);
             }
 
             else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
-                currentDistance = 0;
+                distanceTravelled = 0;
                 currentPoint = 0;
-                noUTurn = false;
-
-                sleep(2);
-                RCLCPP_WARN(this->get_logger(),"Start of the reversing process");
-                reversing = true;
+                noUturnEnd = true;
                 return ;
             }
 
-            if (currentDistance >= nutTraj[currentPoint].distance){
-                currentDistance = 0;
+            if (distanceTravelled >= nutTraj[currentPoint].distance){
+                distanceTravelled = 0;
                 RCLCPP_INFO(this->get_logger(),"Next Point");
                 currentPoint++;
             }
+
+        }else if (uTurn){
+            //....
             
-            
+        }else if (reverse){
+
+            reverseError = false;
+
+            if (hookFdc){
+                targetVelocity = 0.0;
+                sendVel(targetVelocity);
+                sendSteer(0.0);
+                sleep(1.0);
+                lockHook();
+                reverseEnd = true;
+
+            }else if (!hookDetected || hookDistance > 50.0){
+                targetVelocity = REVERSE_VELOCITY;
+                sendVel(targetVelocity);
+                sendSteer(0.0);
+
+            }else if (hookDistance <= 50.0){
+                if (hookLocked)
+                    unlockHook();
+
+                targetVelocity = FINAL_REVERSE_VELOCITY;
+                sendVel(targetVelocity);
+                lowLevelSecurity = true;
+                sendSteer(0.0); //TO DO : Adapt steering according to the QR code position
+
+            }else {
+                reverseError = true;
+            }
+
+        }else if (tow){
+            if (distanceTravelled < TOWING_DISTANCE){
+                targetVelocity = TOWING_VELOCITY;
+                sendVel(targetVelocity);
+                sendSteer(0.0);
+
+            }else{
+                targetVelocity = 0.0;
+                sendVel(targetVelocity);
+                sendSteer(0.0);
+                towingEnd = true;
+            }
         }
 
-        else if (reversing){
-    
-            sendSteer(0.0);
 
-            if (hookDetected && !hookLocked){   
-
-                if (areaStatus[4] == -1) {
-                    RCLCPP_ERROR(this->get_logger(),"Inconsistent events : Hook detected but no obstacle detected");
-                    RCLCPP_ERROR(this->get_logger(),"Final reverse - FAILED");
-                    sendVel(0.0);
-                    reversing = false;
-              
-                }else if (!hookFdc){     //Hook detected => Slow movement until locking distance is reached
-                    unlockHook();
-                    safeMode = false;
-                    sendVel(0.5*FINAL_REVERSE_VELOCITY);
-
-                }else{                  //Lock distance reached => Stop and lock
-                    sendVel(0.0);
-                    sleep(2);
-                    lockHook();
-                    safeMode = true;
-                    reversing = false;
-
-                    RCLCPP_WARN(this->get_logger(),"Start of the towing process");
-                    towing = true;
-                }
-
-            } else{
-                sendVel(FINAL_REVERSE_VELOCITY);
-            }
-
-        }else if (towing){
-
-            if (hookLocked){
-                
-                localMsCounter += PERIOD_UPDATE_MOTION;
-
-                if (localMsCounter <= TOWING_DURATION){    //Towing
-                    sendVel(TOWING_VELOCITY);
-
-                } else{     //End of the towing step
-                    sendVel(0.0);
-                    sleep(2);
-                    unlockHook();
-
-                    localMsCounter = 0ms;
-
-                    RCLCPP_WARN(this->get_logger(),"End of the towing process");
-                    towing = false;
-                }
-            }
-
-        }else 
-            sendVel(0.0);
-        
     }
-    
+
     // ---- Private variables ----
-    bool hookDetected, hookLocked, hookFdc = false;
+    bool hookDetected, hookFdc = false;
+    bool hookLocked = true;
 
     //States
-    bool noUTurn = false;
-    bool reversing = false;
-    bool towing = false;
+    bool noUturn, reverse, uTurn, tow, emergency, avoidance, idle, manual = false;
+
+    //Trans
+    bool towingEnd, reverseEnd, noUturnEnd = false;
+    bool reverseError = false;
 
     //Trajectories
+    float currentVelocity = 0.0;
+    float targetVelocity;
+    float currentSteer = 0.0;
+
     struct VAD_POINT {
         float velocity;
         float angle;
@@ -334,20 +413,21 @@ private:
     };
 
     int currentPoint = 0;
-    float currentDistance = 0.0; //Distance measurement [cm]
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
 
     //Security
+    bool lowLevelSecurity = false;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
-    int16_t areaStatus[20];
-    bool safeMode;    //If false, the automatic safety control is disabled !! (see safe() function)
+    int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
+
+    //Distance
+    float distanceTravelled = 0.0; //Distance measurement [cm]
+    float hookDistance = 0.0;
+
 
     //Time counter
     chrono::milliseconds localMsCounter = 0ms;
-
-    float currentVelocity;
-    float currentSteer;
 
     //Publishers
     rclcpp::Publisher<interfaces::msg::CmdVel>::SharedPtr publisher_cmd_vel_;
