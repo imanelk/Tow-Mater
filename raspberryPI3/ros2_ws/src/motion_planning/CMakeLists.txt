@@ -14,7 +14,7 @@ find_package(interfaces REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 add_executable(motion_planning_node 
-  src/motion_planning_node.cpp
+  src/motion_planning_v2.cpp
 )
 
 
