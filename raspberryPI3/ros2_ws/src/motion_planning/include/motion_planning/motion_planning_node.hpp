@@ -28,7 +28,8 @@
 
 
 // Security
-#define LLS_DISTANCE 15 //LowLevelSecurityDistance = 20cm (LLS_DISTANCE)
+#define NS_DISTANCE 30 //NormalSecurity Distance [cm]
+#define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
 
 
  

@@ -112,7 +112,7 @@ private:
         if (frontObstacles.size() == 0)
             frontObstacleDistance = -1;
         else
-            frontObstacleDistance = *std::min_element(frontObstacles.begin(),frontObstacles.end());
+            frontObstacleDistance = *min_element(frontObstacles.begin(),frontObstacles.end());
         
 
         //Rear obstacles
@@ -124,7 +124,7 @@ private:
         if (rearObstacles.size() == 0)
             rearObstacleDistance = -1;
         else{
-            rearObstacleDistance = *std::min_element(rearObstacles.begin(),rearObstacles.end());
+            rearObstacleDistance = *min_element(rearObstacles.begin(),rearObstacles.end());
         }
         
     }
@@ -248,12 +248,12 @@ private:
             RCLCPP_WARN(this->get_logger(), "EMERGENCY");
         }
         
-        else if (!emergency && !lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance != -1)){
+        else if (!emergency && !lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >= 0) && (frontObstacleDistance <= NS_DISTANCE)){
             emergency = true;
             RCLCPP_WARN(this->get_logger(), "EMERGENCY");
         }
 
-        else if (!emergency && !lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance != -1)){
+        else if (!emergency && !lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >= 0) && (rearObstacleDistance <= NS_DISTANCE)){
             emergency = true;
             RCLCPP_WARN(this->get_logger(), "EMERGENCY");
         }
@@ -268,12 +268,12 @@ private:
             RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
         }
 
-        else if (emergency && !lowLevelSecurity && (targetVelocity > 0) && (frontObstacleDistance == -1)){
+        else if (emergency && !lowLevelSecurity && (targetVelocity > 0) && ( (frontObstacleDistance == -1) || (frontObstacleDistance > NS_DISTANCE) )){
             emergency = false;
             RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
         }
 
-        else if (emergency && !lowLevelSecurity && (targetVelocity < 0) && (rearObstacleDistance == -1)){
+        else if (emergency && !lowLevelSecurity && (targetVelocity < 0) && ( (rearObstacleDistance == -1) || (rearObstacleDistance > NS_DISTANCE) )){
             emergency = false;
             RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
         }
