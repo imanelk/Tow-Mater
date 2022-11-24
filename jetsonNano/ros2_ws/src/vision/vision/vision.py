@@ -65,10 +65,10 @@ class Vision(Node):
             middle_coordinates = [x_coordinates, y_coordinates]
             width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
         else:
-            x_coordinates = -1
-            y_coordinates = -1
-            middle_coordinates = -1
-            width_qr = -1
+            x_coordinates = -1.0
+            y_coordinates = -1.0
+            middle_coordinates = -1.0
+            width_qr = -1.0
         
         # if hookDetected === True:
         #     x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
