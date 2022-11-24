@@ -43,8 +43,6 @@ class Vision(Node):
 
         self.get_logger().info('vision_node READY')
 
-
-
     def image_callback(self, imgMsg):
         
         hookDetected = False
@@ -63,19 +61,13 @@ class Vision(Node):
             x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
             y_coordinates = [(box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)]
             middle_coordinates = [x_coordinates, y_coordinates]
-            width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
+            width_qr = (box_coordinates[0][1][0])-(box_coordinates[0][0][0])
         else:
             x_coordinates = -1.0
             y_coordinates = -1.0
             middle_coordinates = -1.0
             width_qr = -1.0
         
-        # if hookDetected === True:
-        #     x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
-        #     y_coordinates = [(box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)]
-        #     middle_coordinates = [x_coordinates, y_coordinates]
-        #     width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
-
         # if box_coordinates is None:
             # print('No Code')
             # hookDetected = False
@@ -84,21 +76,6 @@ class Vision(Node):
             # hookDetected = True
             # self.get_logger().info('Hook detected')
 
-        # tracer les contours du qr code sur l'image
-#        if box_coordinates is not None:
-#            box_coordinates = [box_coordinates[0].astype(int)]
-#            n = len(box_coordinates[0])
-#            for i in range(n):
-#                cv2.line(img, tuple(box_coordinates[0][i]), tuple(box_coordinates[0][(i+1) % n]), (0,255,0), 3)
-
-        #  print("box coordinates = ", box_coordinates[0])
-        #  print(" ")
-        #  print("middle coordinates = ", middle_coordinates)
-        #  print(" ")
-        #  print("width of qr  = ", width_qr)
- 
-        #cv2.imshow('Output', img) #print l'image avec le QRcode encadré
-        
         msgHook=Hook()
         msgHook.type = 'detect'
         msgHook.status = hookDetected
