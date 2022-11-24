@@ -58,8 +58,8 @@ class Vision(Node):
             hookDetected = False
 
         if hookDetected == True:
-            x_coordinates = [(box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)]
-            y_coordinates = [(box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)]
+            x_coordinates = (box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)
+            y_coordinates = (box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)
             middle_coordinates = [x_coordinates, y_coordinates]
             width_qr = (box_coordinates[0][1][0])-(box_coordinates[0][0][0])
         else:
