@@ -33,6 +33,7 @@ public:
         requestedThrottle = 0;
         requestedSteerAngle = 0;
         autonomousSteerAngle = 0;
+        stopSteer = false;
 
         requestedWheelsSpeedRPM = 0.0;
         requestedWheelsSpeedMPS = 0.0;
@@ -159,6 +160,7 @@ private:
 
     void consignSteerCallback(const interfaces::msg::CmdSteer & cmdSteer){
         autonomousSteerAngle = cmdSteer.angle ;
+        stopSteer = cmdSteer.stop;
 
     }
 
@@ -208,13 +210,20 @@ private:
                 if (requestedWheelsSpeedRPM == 0.0){
                     leftRearPwmCmd = STOP;
                     rightRearPwmCmd = STOP;
-                    steeringCmd(autonomousSteerAngle, currentAngle, steeringPwmCmd);
+                    if (stopSteer)
+                        steeringPwmCmd = STOP;
+                    else
+                        steeringCmd(autonomousSteerAngle, currentAngle, steeringPwmCmd);
                 }
                 else{
                     //Speed control on the left wheel speed in RPM
                     autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
                     autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
-                    steeringCmd(autonomousSteerAngle, currentAngle, steeringPwmCmd);
+                    
+                    if (stopSteer)
+                        steeringPwmCmd = STOP;
+                    else
+                        steeringCmd(autonomousSteerAngle, currentAngle, steeringPwmCmd);
                 }
                 
             }
@@ -312,6 +321,7 @@ private:
     float requestedWheelsSpeedRPM;
     float requestedWheelsSpeedMPS;
     float autonomousSteerAngle ;
+    bool stopSteer;
 
     //Wheels control variables
     uint8_t leftRearPwmCmd;
