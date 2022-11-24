@@ -195,7 +195,7 @@ private:
         auto hookMsg = interfaces::msg::Hook();
 
         hookMsg.type = "lock";
-        hookMsg.status = true;
+        hookMsg.status = false;
         publisher_cmd_hook_->publish(hookMsg);
 
         RCLCPP_INFO(this->get_logger(), "Hook unlocking");
@@ -213,7 +213,7 @@ private:
         auto hookMsg = interfaces::msg::Hook();
 
         hookMsg.type = "lock";
-        hookMsg.status = false;
+        hookMsg.status = true;
         publisher_cmd_hook_->publish(hookMsg);
 
         RCLCPP_INFO(this->get_logger(), "Hook locking");
