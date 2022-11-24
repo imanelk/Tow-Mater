@@ -76,7 +76,11 @@ private:
     void hookCallback(const interfaces::msg::Hook & hookMsg) {
 
         if (hookMsg.type == "detect" && !hookDetected){
-           hookDetected = hookMsg.status;
+            hookDetected = hookMsg.status;
+
+            if (hookDetected)
+                RCLCPP_INFO(this->get_logger(),"Hook detected");
+
            hookDistance = 40.0;
 
         } else if (hookMsg.type == "fdc")
