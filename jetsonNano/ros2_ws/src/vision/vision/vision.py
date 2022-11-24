@@ -102,8 +102,8 @@ class Vision(Node):
         msgHook=Hook()
         msgHook.type = 'detect'
         msgHook.status = hookDetected
-        msgHook.x = x_coordinates
-        msgHook.y = y_coordinates
+        msgHook.x = x_coordinates[0]
+        msgHook.y = y_coordinates[0]
 
         self.publisher_hook_.publish(msgHook)
         
