@@ -28,7 +28,7 @@ public:
 
         nutTraj[1].velocity = 0.8;
         nutTraj[1].angle = -1.0;
-        nutTraj[1].distance = 150.0;
+        nutTraj[1].distance = 175.0;  //150
 
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
