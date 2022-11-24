@@ -21,8 +21,8 @@
 
 #define ID_HOOK 0x111
 
-#define HOOK_UNLOCK 0x0     //frame[0]
-#define HOOK_LOCK 0x1       //frame[0]
+#define HOOK_LOCK 0x0     //frame[0]
+#define HOOK_UNLOCK 0x1       //frame[0]
 
 #define CALIBRATION_REQUEST	0x1		//frame[0]
 #define CALIBRATION_IN_PROGRESS 0x2	//frame[0]
