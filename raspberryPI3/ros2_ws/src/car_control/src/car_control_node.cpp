@@ -10,6 +10,7 @@
 #include "interfaces/msg/cmd_vel.hpp"
 #include "interfaces/msg/pid.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "interfaces/msg/cmd_steer.hpp"
 
 #include "std_srvs/srv/empty.hpp"
 
@@ -31,6 +32,8 @@ public:
         mode = 0;
         requestedThrottle = 0;
         requestedSteerAngle = 0;
+        autonomousSteerAngle = 0;
+        stopSteer = false;
 
         requestedWheelsSpeedRPM = 0.0;
         requestedWheelsSpeedMPS = 0.0;
@@ -60,6 +63,9 @@ public:
 
         subscription_consign_speed_ = this->create_subscription<interfaces::msg::CmdVel>(
         "consign_speed", 10, std::bind(&car_control::consignSpeedCallback, this, _1));
+
+        subscription_consign_steer_ = this->create_subscription<interfaces::msg::CmdSteer>(
+        "consign_steer", 10, std::bind(&car_control::consignSteerCallback, this, _1));
 
         subscription_pid_ = this->create_subscription<interfaces::msg::Pid>(
         "pid", 10, std::bind(&car_control::pidCallback, this, _1));
@@ -152,6 +158,12 @@ private:
 
     }
 
+    void consignSteerCallback(const interfaces::msg::CmdSteer & cmdSteer){
+        autonomousSteerAngle = cmdSteer.angle ;
+        stopSteer = cmdSteer.stop;
+
+    }
+
     /* Update currentSpeed from odometry [callback function]  :
     *
     * This function is called when a message is published on the "/odometry" topic
@@ -198,13 +210,20 @@ private:
                 if (requestedWheelsSpeedRPM == 0.0){
                     leftRearPwmCmd = STOP;
                     rightRearPwmCmd = STOP;
-                    steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
+                    if (stopSteer)
+                        steeringPwmCmd = STOP;
+                    else
+                        steeringCmd(autonomousSteerAngle, currentAngle, steeringPwmCmd);
                 }
                 else{
                     //Speed control on the left wheel speed in RPM
                     autoPropulsionCmd(requestedWheelsSpeedRPM, currentLeftSpeedRPM, leftRearPwmCmd, errorPreviousLeft, errorSumLeft, Kp, Ki, Kd); 
                     autoPropulsionCmd(requestedWheelsSpeedRPM, currentRightSpeedRPM, rightRearPwmCmd, errorPreviousRight, errorSumRight, Kp, Ki, Kd); 
-                    steeringCmd(requestedSteerAngle, currentAngle, steeringPwmCmd);
+                    
+                    if (stopSteer)
+                        steeringPwmCmd = STOP;
+                    else
+                        steeringCmd(autonomousSteerAngle, currentAngle, steeringPwmCmd);
                 }
                 
             }
@@ -301,6 +320,8 @@ private:
     //Auto Mode variables
     float requestedWheelsSpeedRPM;
     float requestedWheelsSpeedMPS;
+    float autonomousSteerAngle ;
+    bool stopSteer;
 
     //Wheels control variables
     uint8_t leftRearPwmCmd;
@@ -325,6 +346,7 @@ private:
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_linear_speed_;
     rclcpp::Subscription<interfaces::msg::CmdVel>::SharedPtr subscription_consign_speed_;
     rclcpp::Subscription<interfaces::msg::Pid>::SharedPtr subscription_pid_;
+    rclcpp::Subscription<interfaces::msg::CmdSteer>::SharedPtr subscription_consign_steer_;
 
 
     //Timer
