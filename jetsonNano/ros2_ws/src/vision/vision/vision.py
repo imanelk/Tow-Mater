@@ -81,7 +81,7 @@ class Vision(Node):
         msgHook.status = hookDetected
         msgHook.x = x_coordinates
         msgHook.y = y_coordinates
-        msgHook.width = width_qr
+       # msgHook.width = width_qr
 
         self.publisher_hook_.publish(msgHook)
         
