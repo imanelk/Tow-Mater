@@ -24,11 +24,11 @@ public:
 
         nutTraj[0].velocity = 0.8;
         nutTraj[0].angle = 1.0;
-        nutTraj[0].distance = 150.0; 
+        nutTraj[0].distance = 150.0;
 
         nutTraj[1].velocity = 0.8;
         nutTraj[1].angle = -1.0;
-        nutTraj[1].distance = 175.0;  //150
+        nutTraj[1].distance = 175.0;
 
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
@@ -57,7 +57,7 @@ public:
         RCLCPP_INFO(this->get_logger(), "motion_planning_node v2 READY");
 
         sendVel(INITIAL_VELOCITY);
-        sendSteer(INITIAL_STEER);
+        sendSteer(INITIAL_STEER,false);
 
         noUturn = true;
         RCLCPP_WARN(this->get_logger(), "NO U-TURN");
@@ -164,22 +164,29 @@ private:
     /* Publish the steering angle on the /cmd/steer topic
     * If the angle is the same as the current one : the angle is not published
     */
-    void sendSteer(float angle){
+    void sendSteer(float angle, bool steerEmergency){
 
-        if (angle != currentSteer){
+        if ((angle != currentSteer) || (currentSteerEmergency != steerEmergency)){
 
             //Send steering command to car_control_node
             auto cmdSteerMsg = interfaces::msg::CmdSteer();
 
             cmdSteerMsg.angle = angle;
+            cmdSteerMsg.emergency = steerEmergency;
 
             publisher_cmd_steer_->publish(cmdSteerMsg);
 
             currentSteer = angle;
-            RCLCPP_INFO(this->get_logger(), "STEERING : %.2f ",currentSteer);
+            currentSteerEmergency = steerEmergency;
+
+            if (steerEmergency)
+                RCLCPP_INFO(this->get_logger(), "STEERING : STOP ");
+            else
+                RCLCPP_INFO(this->get_logger(), "STEERING : %.2f ",currentSteer);
         }
         
     }
+    
 
     /* Publish the hook locking order on the /hook topic
     *
@@ -222,7 +229,7 @@ private:
         if (obstaclesReceived <= 0){
             
             sendVel(0.0);
-            sendSteer(0.0);
+            sendSteer(0.0,false);
             if (obstaclesReceived == 0){
                 obstaclesReceived = -1;    //To print the message once
                 RCLCPP_INFO(this->get_logger(), "Waiting for obstacle analysis");
@@ -318,6 +325,7 @@ private:
         else if (emergency){ 
 
             sendVel(0.0);
+            sendSteer(currentSteer,true);
 
         
         }else if (avoidance){
@@ -328,7 +336,7 @@ private:
             if (currentPoint < NB_NUT_POINTS){
                 targetVelocity = nutTraj[currentPoint].velocity;
                 sendVel(targetVelocity);
-                sendSteer(nutTraj[currentPoint].angle);
+                sendSteer(nutTraj[currentPoint].angle, false);
             }
 
             else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
@@ -342,7 +350,9 @@ private:
             if (distanceTravelled >= nutTraj[currentPoint].distance){
                 distanceTravelled = 0;
                 RCLCPP_INFO(this->get_logger(),"Next Point");
-                currentPoint++;
+
+                currentPoint++;          
+
             }
 
         }else if (uTurn){
@@ -355,7 +365,7 @@ private:
             if (hookFdc){
                 targetVelocity = 0.0;
                 sendVel(targetVelocity);
-                sendSteer(0.0);
+                sendSteer(0.0,false);
                 sleep(1.0);
                 lockHook();
                 reverseEnd = true;
@@ -363,7 +373,7 @@ private:
             }else if (!hookDetected || hookDistance > 50.0){
                 targetVelocity = REVERSE_VELOCITY;
                 sendVel(targetVelocity);
-                sendSteer(0.0);
+                sendSteer(0.0,false);
 
             }else if (hookDistance <= 50.0){
                 if (hookLocked)
@@ -372,7 +382,7 @@ private:
                 targetVelocity = FINAL_REVERSE_VELOCITY;
                 sendVel(targetVelocity);
                 lowLevelSecurity = true;
-                sendSteer(0.0); //TO DO : Adapt steering according to the QR code position
+                sendSteer(0.0,false); //TO DO : Adapt steering according to the QR code position
 
             }else {
                 reverseError = true;
@@ -382,12 +392,12 @@ private:
             if (distanceTravelled < TOWING_DISTANCE){
                 targetVelocity = TOWING_VELOCITY;
                 sendVel(targetVelocity);
-                sendSteer(0.0);
+                sendSteer(0.0,false);
 
             }else{
                 targetVelocity = 0.0;
                 sendVel(targetVelocity);
-                sendSteer(0.0);
+                sendSteer(0.0,false);
                 towingEnd = true;
             }
         }
@@ -425,6 +435,7 @@ private:
     bool lowLevelSecurity = false;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
+    bool currentSteerEmergency = false; //true => the steering movement is stopped
 
     //Distance
     float distanceTravelled = 0.0; //Distance measurement [cm]
