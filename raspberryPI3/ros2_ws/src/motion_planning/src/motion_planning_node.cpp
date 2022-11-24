@@ -24,11 +24,11 @@ public:
 
         nutTraj[0].velocity = 0.8;
         nutTraj[0].angle = 1.0;
-        nutTraj[0].distance = 90.0; 
+        nutTraj[0].distance = 130.0; 
 
         nutTraj[1].velocity = 0.8;
         nutTraj[1].angle = -1.0;
-        nutTraj[1].distance = 90.0;
+        nutTraj[1].distance = 130.0;
 
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
@@ -334,6 +334,7 @@ private:
             else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
                 distanceTravelled = 0;
                 currentPoint = 0;
+                sleep(3);
                 noUturnEnd = true;
                 return ;
             }
