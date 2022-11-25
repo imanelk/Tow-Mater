@@ -11,6 +11,7 @@ import cv2 # OpenCV library
 import matplotlib
 import numpy as np
 import imutils
+import time
 
 #colors
 from webcolors import rgb_to_name,CSS3_HEX_TO_NAMES,hex_to_rgb #python3 -m pip install webcolors
@@ -84,7 +85,7 @@ class Vision(Node):
        # msgHook.width = width_qr
 
         self.publisher_hook_.publish(msgHook)
-        
+        time.sleep(0.2)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
