@@ -75,13 +75,12 @@ private:
     */
     void hookCallback(const interfaces::msg::Hook & hookMsg) {
 
-        if (hookMsg.type == "detect" && !hookDetected){
-            hookDetected = hookMsg.status;
+        if (hookMsg.type == "detect" && hookMsg.status == true){
+            hookDetected = true;
+            hookPos_x = hookMsg.x;
 
-            if (hookDetected)
-                RCLCPP_INFO(this->get_logger(),"Hook detected");
 
-           hookDistance = 40.0;
+            hookDistance = 40.0;
 
         } else if (hookMsg.type == "fdc")
             hookFdc = hookMsg.status;
@@ -141,7 +140,7 @@ private:
 
 
     
-    /* Publish the velocity on the /cmd/vel topic
+    /* Publish the velocity on the /consign_speed topic
     * If the velocity is not safe or if the velocity is the same as the current one : the velocity is not published
     */
     void sendVel(float velocity){
@@ -161,12 +160,17 @@ private:
         
     }
 
-    /* Publish the steering angle on the /cmd/steer topic
+    /* Publish the steering angle on the /consign_steer topic
     * If the angle is the same as the current one : the angle is not published
     */
     void sendSteer(float angle, bool steerStop){
 
         if ((angle != currentSteer) || (currentSteerStop != steerStop)){
+
+            if (angle > 1.0)
+                angle = 1.0;
+            else if (angle < -1.0)
+                angle = -1.0;
 
             //Send steering command to car_control_node
             auto cmdSteerMsg = interfaces::msg::CmdSteer();
@@ -382,7 +386,8 @@ private:
                 targetVelocity = FINAL_REVERSE_VELOCITY;
                 sendVel(targetVelocity);
                 lowLevelSecurity = true;
-                sendSteer(0.0,false); //TO DO : Adapt steering according to the QR code position
+                targetSteer = -(hookPos_x/200.0) + 260.0/200;
+                sendSteer(targetSteer,false); //TO DO : Adapt steering according to the QR code position
 
             }else {
                 reverseError = true;
@@ -419,7 +424,9 @@ private:
     //Trajectories
     float currentVelocity = 0.0;
     float targetVelocity;
+    float targetSteer;
     float currentSteer = 0.0;
+    float hookPos_x = -1.0;
 
     struct VAD_POINT {
         float velocity;
