@@ -61,12 +61,12 @@ class Vision(Node):
             x_coordinates = (box_coordinates[0][0][0]) + (((box_coordinates[0][1][0])-(box_coordinates[0][0][0]))/2)
             y_coordinates = (box_coordinates[0][0][1]) + (((box_coordinates[0][2][1])-(box_coordinates[0][0][1]))/2)
             middle_coordinates = [x_coordinates, y_coordinates]
-            width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
+            #width_qr = box_coordinates[0][1][0]-box_coordinates[0][0][0]
         else:
             x_coordinates = -1.0
             y_coordinates = -1.0
             middle_coordinates = -1.0
-            width_qr = -1.0
+            #width_qr = -1.0
         
         # if box_coordinates is None:
             # print('No Code')
