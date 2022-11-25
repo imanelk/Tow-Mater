@@ -12,12 +12,12 @@
 // ---- Final reverse and towing ----
 
 #define REVERSE_VELOCITY -1.0
-#define FINAL_REVERSE_VELOCITY -0.3 // [m/s]
+#define FINAL_REVERSE_VELOCITY -0.7 // [m/s]
 
 #define LOCK_WAITING_TIME 4 //Waiting time after the lock order [s]
 
 #define TOWING_VELOCITY 1.0 // [m/s] 
-#define TOWING_DISTANCE 5000 // [cm]
+#define TOWING_DISTANCE 4000 // [cm]
 
 // ---- Trajectories
 
