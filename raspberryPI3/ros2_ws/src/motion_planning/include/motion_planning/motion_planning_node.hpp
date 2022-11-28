@@ -5,22 +5,33 @@
 #include <string.h>  
 
 #define PERIOD_UPDATE_MOTION 5ms    // Update period of the movement calculation
-#define PERIOD_CHECK_SECURITY 10ms // Update period of the propulsion and steering commands in [ms]
 
-#define INITIAL_VELOCITY 0
-#define INITIAL_STEER 0
-
-#define MAX_VELOCITY 1.2   // [m/s]
+#define INITIAL_VELOCITY 0.0
+#define INITIAL_STEER 0.0
 
 // ---- Final reverse and towing ----
 
-#define FINAL_REVERSE_VELOCITY -0.8 // [m/s]
+#define REVERSE_VELOCITY -1.0
+#define FINAL_REVERSE_VELOCITY -0.7 // [m/s]
 
-#define LOCK_DISTANCE 21    // Lock distance (between US rear center and the damaged car) [cm]
 #define LOCK_WAITING_TIME 4 //Waiting time after the lock order [s]
 
 #define TOWING_VELOCITY 1.0 // [m/s] 
-#define TOWING_DURATION 10000ms 
+#define TOWING_DISTANCE 4000 // [cm]
+
+// ---- Trajectories
+
+// No U-turn (NUT)
+
+#define NB_NUT_POINTS 3
+
+
+
+// Security
+#define NS_DISTANCE 50 //NormalSecurity Distance [cm]
+#define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
+
+
  
 
 #endif /*__motion_planning_node_HPP */
