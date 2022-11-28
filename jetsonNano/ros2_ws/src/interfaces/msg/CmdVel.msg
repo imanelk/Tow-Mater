@@ -1,0 +1,1 @@
+float32 velocity 0 # linear velocity [m/s], < 0 => reverse
