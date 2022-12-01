@@ -22,6 +22,8 @@ public:
         currentVelocity = -1; 
         currentSteer = -1;
 
+        //No U-Turn trajectory
+
         nutTraj[0].velocity = 0.8;
         nutTraj[0].angle = 1.0;
         nutTraj[0].distance = 150.0;
@@ -33,6 +35,24 @@ public:
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
         nutTraj[2].distance = 0.0;
+
+        //U-Turn trajectory
+
+        utTraj[0].velocity = -0.8;
+        utTraj[0].angle = -1.0;
+        utTraj[0].distance = 150.0;
+
+        utTraj[1].velocity = -0.8;
+        utTraj[1].angle = 0.0;
+        utTraj[1].distance = 50.0;
+
+        utTraj[2].velocity = 0.8;
+        utTraj[2].angle = 1.0;
+        utTraj[2].distance = 175.0;
+
+        utTraj[3].velocity = 0.0;
+        utTraj[3].angle = 0.0;
+        utTraj[3].distance = 0.0;
 
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
         publisher_cmd_steer_= this->create_publisher<interfaces::msg::CmdSteer>("consign_steer", 10);
@@ -59,8 +79,8 @@ public:
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER,false);
 
-        noUturn = true;
-        RCLCPP_WARN(this->get_logger(), "NO U-TURN");
+        uTurn = true;
+        RCLCPP_WARN(this->get_logger(), "U-TURN");
 
 
     }
@@ -297,8 +317,14 @@ private:
             RCLCPP_WARN(this->get_logger(), "EMERGENCY [exit]");
         }
 
-        if (noUturn && noUturnEnd){
+        if (noUturn && alignmentEnd){
             noUturn = false;
+            reverse = true;
+            RCLCPP_WARN(this->get_logger(), "REVERSE");
+        }
+
+        if (uTurn && alignmentEnd){
+            uTurn = false;
             reverse = true;
             RCLCPP_WARN(this->get_logger(), "REVERSE");
         }
@@ -357,7 +383,7 @@ private:
                 distanceTravelled = 0;
                 currentPoint = 0;
                 sleep(3);
-                noUturnEnd = true;
+                alignmentEnd = true;
                 return ;
             }
 
@@ -370,7 +396,27 @@ private:
             }
 
         }else if (uTurn){
-            //....
+            if (currentPoint < NB_UT_POINTS){
+                targetVelocity = utTraj[currentPoint].velocity;
+                sendVel(targetVelocity);
+                sendSteer(utTraj[currentPoint].angle, false);
+            }
+
+            else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
+                distanceTravelled = 0;
+                currentPoint = 0;
+                sleep(3);
+                alignmentEnd = true;
+                return ;
+            }
+
+            if (distanceTravelled >= utTraj[currentPoint].distance){
+                distanceTravelled = 0;
+                RCLCPP_INFO(this->get_logger(),"Next Point");
+
+                currentPoint++;          
+
+            }
             
         }else if (reverse){
 
@@ -435,7 +481,7 @@ private:
     bool noUturn, reverse, uTurn, tow, emergency, avoidance, idle, manual = false;
 
     //Trans
-    bool towingEnd, reverseEnd, noUturnEnd = false;
+    bool towingEnd, reverseEnd, alignmentEnd = false;
     bool reverseError = false;
 
     //Trajectories
@@ -454,6 +500,7 @@ private:
     int currentPoint = 0;
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
+    VAD_POINT utTraj[NB_UT_POINTS];
 
     //Security
     bool lowLevelSecurity = false;
