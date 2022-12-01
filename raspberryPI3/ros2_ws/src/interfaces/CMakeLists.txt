@@ -26,6 +26,7 @@ set(msg_files
   "msg/CmdVel.msg"
   "msg/CmdSteer.msg"
   "msg/Obstacles.msg"
+  "msg/Distance.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
