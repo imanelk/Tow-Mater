@@ -9,6 +9,8 @@
 #include "interfaces/msg/obstacles.hpp"
 #include "interfaces/msg/distance.hpp"
 
+#include "interfaces/msg/ultrasonic.hpp"
+
 using namespace std;
 using placeholders::_1;
 
@@ -49,6 +51,8 @@ public:
         subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
 
+        subscription_ultrasonic_ = this->create_subscription<interfaces::msg::Ultrasonic>(
+        "ultrasonic", 10, std::bind(&car_control::pidCallback, this, _1));
 
 
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
@@ -148,6 +152,27 @@ private:
 
     }
 
+    void ultrasonicCallback(const interfaces::msg::Ultrasonic & usonic){
+        usRearLeft = usonic.rear_left ;
+        usRearRight = usonic.rear_right ;
+    }
+
+    float computeTargetAngle(int usRLeft, int usRRight){
+
+        float errorUS = usRLeft - usRRight ;
+
+        if (abs(errorUS)< 1){
+            return 0.0 ;
+        }
+        else {
+            if (errorUS > 0){
+                return 1.0 ;
+            }
+            else {
+                return -1.0 ;
+            }
+        }
+    }
 
     
     /* Publish the velocity on the /consign_speed topic
@@ -390,7 +415,10 @@ private:
                 sendSteer(0.0,false);
 
             }else if (hookDistance <= 50.0){
-                targetSteer = -(hookPos_x/200.0) + 260.0/200;
+                // targetSteer = -(hookPos_x/200.0) + 260.0/200;
+                // Target steer in function of the ultrasonic sensors
+
+                targetSteer = computeTargetAngle(usRearLeft,usRearRight) ;
 
                 if (hookLocked){
                     targetVelocity = 0.0;
@@ -444,6 +472,11 @@ private:
     float targetSteer;
     float currentSteer = 0.0;
     float hookPos_x = -1.0;
+
+    // Ultrasonic sensors
+
+    int usRearLeft ;
+    int usRearRight ;
 
     struct VAD_POINT {
         float velocity;
