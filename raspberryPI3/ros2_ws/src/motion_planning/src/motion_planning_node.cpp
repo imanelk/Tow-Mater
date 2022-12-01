@@ -386,13 +386,20 @@ private:
                 sendSteer(0.0,false);
 
             }else if (hookDistance <= 50.0){
-                if (hookLocked)
-                    unlockHook();
+                targetSteer = -(hookPos_x/200.0) + 260.0/200;
 
+                if (hookLocked){
+                    targetVelocity = 0.0;
+                    sendVel(targetVelocity);
+                    sendSteer(targetSteer,false);
+                    sleep(1.0);
+                    unlockHook();
+                }
+                
                 targetVelocity = FINAL_REVERSE_VELOCITY;
                 sendVel(targetVelocity);
                 lowLevelSecurity = true;
-                targetSteer = -(hookPos_x/200.0) + 260.0/200;
+                
                 sendSteer(targetSteer,false); //TO DO : Adapt steering according to the QR code position
 
             }else {
