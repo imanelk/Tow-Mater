@@ -76,7 +76,11 @@ private:
     void hookCallback(const interfaces::msg::Hook & hookMsg) {
 
         if (hookMsg.type == "detect" && hookMsg.status == true){
-            hookDetected = true;
+
+            if (!hookDetected){
+                RCLCPP_INFO(this->get_logger(), "Hook detected");
+                hookDetected = true;
+            }
             hookPos_x = hookMsg.x;
 
 
@@ -395,7 +399,7 @@ private:
                     sleep(1.0);
                     unlockHook();
                 }
-                
+
                 targetVelocity = FINAL_REVERSE_VELOCITY;
                 sendVel(targetVelocity);
                 lowLevelSecurity = true;
