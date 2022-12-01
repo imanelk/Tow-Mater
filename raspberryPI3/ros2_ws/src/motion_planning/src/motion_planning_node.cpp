@@ -76,7 +76,11 @@ private:
     void hookCallback(const interfaces::msg::Hook & hookMsg) {
 
         if (hookMsg.type == "detect" && hookMsg.status == true){
-            hookDetected = true;
+
+            if (!hookDetected){
+                RCLCPP_INFO(this->get_logger(), "Hook detected");
+                hookDetected = true;
+            }
             hookPos_x = hookMsg.x;
 
 
@@ -134,8 +138,14 @@ private:
     * 
     */
     void distanceCallback(const interfaces::msg::Distance & distanceMsg){
-
+ 
         distanceTravelled += distanceMsg.last;
+        printDistance += distanceMsg.last;
+        if (printDistance >= 20.0){
+            printDistance = 0.0;
+            RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
+        }       
+
     }
 
 
@@ -380,13 +390,20 @@ private:
                 sendSteer(0.0,false);
 
             }else if (hookDistance <= 50.0){
-                if (hookLocked)
+                targetSteer = -(hookPos_x/200.0) + 260.0/200;
+
+                if (hookLocked){
+                    targetVelocity = 0.0;
+                    sendVel(targetVelocity);
+                    sendSteer(targetSteer,false);
+                    sleep(1.0);
                     unlockHook();
+                }
 
                 targetVelocity = FINAL_REVERSE_VELOCITY;
                 sendVel(targetVelocity);
                 lowLevelSecurity = true;
-                targetSteer = -(hookPos_x/200.0) + 260.0/200;
+                
                 sendSteer(targetSteer,false); //TO DO : Adapt steering according to the QR code position
 
             }else {
@@ -446,6 +463,7 @@ private:
 
     //Distance
     float distanceTravelled = 0.0; //Distance measurement [cm]
+    float printDistance = 0.0;
     float hookDistance = 0.0;
 
 
