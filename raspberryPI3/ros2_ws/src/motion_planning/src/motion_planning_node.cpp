@@ -40,15 +40,15 @@ public:
 
         utTraj[0].velocity = -0.8;
         utTraj[0].angle = -1.0;
-        utTraj[0].distance = 150.0;
+        utTraj[0].distance = 320.0;
 
-        utTraj[1].velocity = -0.8;
-        utTraj[1].angle = 0.0;
-        utTraj[1].distance = 50.0;
+        utTraj[1].velocity = 0.8;
+        utTraj[1].angle = 1.0;
+        utTraj[1].distance = 186.0;
 
-        utTraj[2].velocity = 0.8;
-        utTraj[2].angle = 1.0;
-        utTraj[2].distance = 175.0;
+        utTraj[2].velocity = -0.8;
+        utTraj[2].angle = -1.0;
+        utTraj[2].distance = 154.0;
 
         utTraj[3].velocity = 0.0;
         utTraj[3].angle = 0.0;
@@ -414,7 +414,11 @@ private:
                 distanceTravelled = 0;
                 RCLCPP_INFO(this->get_logger(),"Next Point");
 
-                currentPoint++;          
+                currentPoint++;
+
+                targetVelocity = 0.0;
+                sendVel(targetVelocity);
+                sleep(3);        
 
             }
             
