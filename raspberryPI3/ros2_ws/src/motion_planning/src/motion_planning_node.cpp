@@ -80,6 +80,7 @@ public:
         sendSteer(INITIAL_STEER,false);
 
         uTurn = true;
+        safeMode = false;
         RCLCPP_WARN(this->get_logger(), "U-TURN");
 
 
@@ -273,24 +274,30 @@ private:
         }
 
         //Transitions
-        if (!emergency && lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >=0) && (frontObstacleDistance <= LLS_DISTANCE)){
-            emergency = true;
-            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
 
-        } else if (!emergency && lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >=0) && (rearObstacleDistance <= LLS_DISTANCE)){
-            emergency = true;
-            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+        if (!emergency && safeMode){
+
+            if (lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >=0) && (frontObstacleDistance <= LLS_DISTANCE)){
+                emergency = true;
+                RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+
+            } else if (lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >=0) && (rearObstacleDistance <= LLS_DISTANCE)){
+                emergency = true;
+                RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+            }
+            
+            else if (!lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >= 0) && (frontObstacleDistance <= NS_DISTANCE)){
+                emergency = true;
+                RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+            }
+
+            else if (!lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >= 0) && (rearObstacleDistance <= NS_DISTANCE)){
+                emergency = true;
+                RCLCPP_WARN(this->get_logger(), "EMERGENCY");
+            }
+
         }
         
-        else if (!emergency && !lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >= 0) && (frontObstacleDistance <= NS_DISTANCE)){
-            emergency = true;
-            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
-        }
-
-        else if (!emergency && !lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >= 0) && (rearObstacleDistance <= NS_DISTANCE)){
-            emergency = true;
-            RCLCPP_WARN(this->get_logger(), "EMERGENCY");
-        }
         
         
         if(emergency && lowLevelSecurity && (targetVelocity > 0) && ((frontObstacleDistance==-1) || (frontObstacleDistance > LLS_DISTANCE))){
@@ -373,52 +380,75 @@ private:
         
         }else if (noUturn){
 
-            if (currentPoint < NB_NUT_POINTS){
+            if (currentPoint == -1){
+                currentPoint = 0;
+                sendSteer(nutTraj[currentPoint].angle, false);
                 targetVelocity = nutTraj[currentPoint].velocity;
                 sendVel(targetVelocity);
-                sendSteer(nutTraj[currentPoint].angle, false);
-            }
-
-            else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
-                distanceTravelled = 0;
-                currentPoint = 0;
-                sleep(3);
-                alignmentEnd = true;
-                return ;
+                
             }
 
             if (distanceTravelled >= nutTraj[currentPoint].distance){
-                distanceTravelled = 0;
-                RCLCPP_INFO(this->get_logger(),"Next Point");
 
-                currentPoint++;          
+                if (currentPoint == (NB_UT_POINTS - 1)){    //Last point
+                    distanceTravelled = 0;
+                    currentPoint = -1;
+                    alignmentEnd = true;
+                    return ;
+                }
+                else{
+                    distanceTravelled = 0;
 
+                    RCLCPP_INFO(this->get_logger(),"Next Point");
+                    currentPoint++; 
+
+                    sendSteer(utTraj[currentPoint].angle, false);
+                    targetVelocity = utTraj[currentPoint].velocity;
+                    sendVel(targetVelocity);
+                }
             }
 
         }else if (uTurn){
-            if (currentPoint < NB_UT_POINTS){
-                targetVelocity = utTraj[currentPoint].velocity;
-                sendVel(targetVelocity);
-                sendSteer(utTraj[currentPoint].angle, false);
-            }
-
-            else{  //currentPoint == lastPoint + 1 (ie end of the maneuver)
-                distanceTravelled = 0;
+        
+            if (currentPoint == -1){
                 currentPoint = 0;
-                sleep(3);
-                alignmentEnd = true;
-                return ;
+
+                targetVelocity = 0.0;   //Stop
+                sendVel(targetVelocity);
+
+                sendSteer(utTraj[currentPoint].angle, false); //Turn steering and wait
+                sleep(4);
+
+                targetVelocity = utTraj[currentPoint].velocity; //Send velocity
+                sendVel(targetVelocity);
+                
             }
 
             if (distanceTravelled >= utTraj[currentPoint].distance){
-                distanceTravelled = 0;
-                RCLCPP_INFO(this->get_logger(),"Next Point");
 
-                currentPoint++;
+                if (currentPoint == (NB_UT_POINTS - 1)){    //Last point
+                    distanceTravelled = 0;
+                    currentPoint = -1;
+                    alignmentEnd = true;
+                    safeMode = true;
+                    return ;
+                }
+                else{
+                    distanceTravelled = 0;
 
-                targetVelocity = 0.0;
-                sendVel(targetVelocity);
-                sleep(3);        
+                    targetVelocity = 0.0; //Stop
+                    sendVel(targetVelocity);
+
+                    RCLCPP_INFO(this->get_logger(),"Next Point");
+                    currentPoint++; 
+
+                    sendSteer(utTraj[currentPoint].angle, false);   //Turn steering and wait
+                    sleep(4);
+
+                    targetVelocity = utTraj[currentPoint].velocity; 
+                    sendVel(targetVelocity);    //Send velocity
+                }
+                      
 
             }
             
@@ -501,12 +531,13 @@ private:
         float distance;
     };
 
-    int currentPoint = 0;
+    int currentPoint = -1;
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
     VAD_POINT utTraj[NB_UT_POINTS];
 
     //Security
+    bool safeMode = true;
     bool lowLevelSecurity = false;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
