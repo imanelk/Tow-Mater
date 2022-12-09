@@ -52,7 +52,7 @@ public:
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
 
         subscription_ultrasonic_ = this->create_subscription<interfaces::msg::Ultrasonic>(
-        "ultrasonic", 10, std::bind(&car_control::pidCallback, this, _1));
+        "ultrasonic", 10, std::bind(&motion_planning::ultrasonicCallback, this, _1));
 
 
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
@@ -512,6 +512,10 @@ private:
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
+    rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_ultrasonic_;
+
+
+
 
     //Timers
     rclcpp::TimerBase::SharedPtr timer_security_;
