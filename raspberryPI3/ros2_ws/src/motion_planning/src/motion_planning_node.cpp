@@ -63,7 +63,8 @@ public:
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER,false);
 
-        noUturn = true;
+        reverse = true;
+
         RCLCPP_WARN(this->get_logger(), "NO U-TURN");
 
 
@@ -166,10 +167,10 @@ private:
         }
         else {
             if (errorUS > 0){
-                return 1.0 ;
+                return -1.0 ;
             }
             else {
-                return -1.0 ;
+                return 1.0 ;
             }
         }
     }
