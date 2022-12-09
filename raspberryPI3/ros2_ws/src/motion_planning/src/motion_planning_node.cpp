@@ -73,7 +73,7 @@ public:
 
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
  
-        sleep(2);   //Waiting for car_control to start
+        sleep(15);   //Waiting for car_control to start
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
         sendVel(INITIAL_VELOCITY);
