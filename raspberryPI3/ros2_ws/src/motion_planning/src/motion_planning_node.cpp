@@ -8,6 +8,7 @@
 #include "interfaces/msg/hook.hpp"
 #include "interfaces/msg/obstacles.hpp"
 #include "interfaces/msg/distance.hpp"
+#include "interfaces/msg/joystick_order.hpp"
 
 using namespace std;
 using placeholders::_1;
@@ -59,6 +60,8 @@ public:
         publisher_cmd_hook_= this->create_publisher<interfaces::msg::Hook>("hook", 10);
 
        
+        subscription_joystick_order_ = this->create_subscription<interfaces::msg::JoystickOrder>(
+        "joystick_order", 10, std::bind(&motion_planning::joystickOrderCallback, this, _1));
 
         subscription_hook_ = this->create_subscription<interfaces::msg::Hook>(
         "hook", 10, std::bind(&motion_planning::hookCallback, this, _1));
@@ -73,13 +76,16 @@ public:
 
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
  
-        sleep(15);   //Waiting for car_control to start
+        sleep(2);   //Waiting for car_control to start
         RCLCPP_INFO(this->get_logger(), "motion_planning_node READY");
 
         sendVel(INITIAL_VELOCITY);
         sendSteer(INITIAL_STEER,false);
 
+        idle = true;
+        manual = true;
         uTurn = true;
+
         safeMode = false;
         RCLCPP_WARN(this->get_logger(), "U-TURN");
 
@@ -88,6 +94,49 @@ public:
 
     
 private:
+
+
+    /* Update start and mode from joystick order [callback function]  :
+    *
+    *  This function is called when a message is published on the "/joystick_order" topic
+    * 
+    */
+    void joystickOrderCallback(const interfaces::msg::JoystickOrder & joyOrder) {
+
+        if (joyOrder.start != start){
+            start = joyOrder.start;
+
+            if (start){
+                idle = false;
+                RCLCPP_WARN(this->get_logger(), "IDLE [exit]");
+
+            }else{ 
+                //idle = true;
+                //RCLCPP_WARN(this->get_logger(), "IDLE");
+            }
+        }
+        
+
+        if (joyOrder.mode != mode && joyOrder.mode != -1){ //if mode change
+            mode = joyOrder.mode;
+
+            if (mode==0){
+                //manual = true;  //Manual mode
+                RCLCPP_WARN(this->get_logger(), "MANUAL");
+
+            }else if (mode==1){
+
+                manual = false; // Autonomous mode (states "MOVE", "EMERGENCY", "TOW")
+                RCLCPP_WARN(this->get_logger(), "MANUAL [exit]");
+
+            }else if (mode==2){
+                //idle = true;
+                RCLCPP_WARN(this->get_logger(), "IDLE");
+            }
+        }
+    }
+
+
 
     /* Update "hookDetected" from hook status [callback function]  :
     *
@@ -358,16 +407,17 @@ private:
         }
 
         //States
-        if (manual){
-            return;
-
-        } else if (idle){
+        
+        if (idle){
 
             targetVelocity = 0.0;
             sendVel(targetVelocity);
-            if (hookLocked)
-                unlockHook();        
+
+            sendSteer(currentSteer,true);       
         }
+
+        else if (manual)
+            return;
 
         else if (emergency){ 
 
@@ -511,6 +561,10 @@ private:
     bool hookDetected, hookFdc = false;
     bool hookLocked = true;
 
+    //Mode (0 : manual, 1 : autonomous)
+    int mode = 0;
+    bool start = false;
+
     //States
     bool noUturn, reverse, uTurn, tow, emergency, avoidance, idle, manual = false;
 
@@ -558,6 +612,7 @@ private:
     rclcpp::Publisher<interfaces::msg::Hook>::SharedPtr publisher_cmd_hook_;
 
     //Subscribers
+    rclcpp::Subscription<interfaces::msg::JoystickOrder>::SharedPtr subscription_joystick_order_;
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
