@@ -412,6 +412,7 @@ private:
             }else if (!hookDetected || hookDistance > 50.0){
                 targetVelocity = REVERSE_VELOCITY;
                 sendVel(targetVelocity);
+
                 sendSteer(0.0,false);
 
             }else if (hookDistance <= 50.0){
