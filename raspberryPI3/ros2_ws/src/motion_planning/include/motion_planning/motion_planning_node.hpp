@@ -32,7 +32,7 @@
 
 
 // Security
-#define NS_DISTANCE 50 //NormalSecurity Distance [cm]
+#define NS_DISTANCE 75 //NormalSecurity Distance [cm]
 #define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
 
 
