@@ -45,7 +45,7 @@ public:
 
         utTraj[1].velocity = 0.8;
         utTraj[1].angle = 1.0;
-        utTraj[1].distance = 196.0;
+        utTraj[1].distance = 191.0;
 
         utTraj[2].velocity = -0.8;
         utTraj[2].angle = -1.0;
