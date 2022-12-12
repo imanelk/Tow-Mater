@@ -9,10 +9,12 @@
 #define INITIAL_VELOCITY 0.0
 #define INITIAL_STEER 0.0
 
+#define TOLERANCE_STEER 0.05
+
 // ---- Final reverse and towing ----
 
 #define REVERSE_VELOCITY -1.0
-#define FINAL_REVERSE_VELOCITY -0.7 // [m/s]
+#define FINAL_REVERSE_VELOCITY -0.5 // [m/s]
 
 #define LOCK_WAITING_TIME 1 //Waiting time after the lock order [s]
 
@@ -36,6 +38,10 @@
 #define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
 
 
+// State machine
+#define INITIAL_STATE_MACHINE idle
+#define INITIAL_AUTONOMOUS move
+#define INITIAL_MOVE uTurn
  
 
 #endif /*__motion_planning_node_HPP */
