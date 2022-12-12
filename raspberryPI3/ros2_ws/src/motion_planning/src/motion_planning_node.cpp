@@ -421,6 +421,7 @@ private:
         alignmentEnd = false;
         hookFdc = false;
         hookLocked = false;
+        hookEnd = false;
         obstacleDetected = false;
         towingEnd = false;
 
@@ -560,7 +561,7 @@ private:
             printState = true;
         }
 
-        if (reverse && hookLocked){
+        if (reverse && hookLocked && hookEnd){
             reverse = false;
             tow = true;
             lowLevelSecurity = false;
@@ -753,6 +754,7 @@ private:
                 sendSteer(0.0,false);
                 sleep(1.0);
                 lockHook();
+                hookEnd = true;
 
             }
 
@@ -771,8 +773,8 @@ private:
     bool printState = true; // If true, the current state is displayed in the terminal
 
     //Transitions
-    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookLocked, hookFdc, obstacleDetected, safeMode, towingEnd = false;
-
+    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd = false;
+    bool hookLocked = true;
     //Trajectories
     float currentVelocity = 0.0;
     float targetVelocity;

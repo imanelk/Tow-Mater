@@ -9,7 +9,7 @@
 #define INITIAL_VELOCITY 0.0
 #define INITIAL_STEER 0.0
 
-#define TOLERANCE_STEER 0.05
+#define TOLERANCE_STEER 0.1
 
 // ---- Final reverse and towing ----
 
