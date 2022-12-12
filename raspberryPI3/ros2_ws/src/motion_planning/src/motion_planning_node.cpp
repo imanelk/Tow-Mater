@@ -164,12 +164,16 @@ private:
     */
     void distanceCallback(const interfaces::msg::Distance & distanceMsg){
  
-        distanceTravelled += distanceMsg.last;
-        printDistance += distanceMsg.last;
-        if (printDistance >= 20.0){
-            printDistance = 0.0;
-            RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-        }       
+        distanceTravelled += distanceMsg.total - lastDistance;
+        lastDistance = distanceMsg.total;
+
+        //RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
+
+        // printDistance = distanceTravelled;
+        // if (printDistance >= 20.0){
+        //     printDistance = 0.0;
+        //     RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
+        // }
 
     }
 
@@ -801,6 +805,7 @@ private:
 
     //Distance
     float distanceTravelled = 0.0; //Distance measurement [cm]
+    float lastDistance = 0.0; //Last total distance [cm]
     float printDistance = 0.0;
     float hookDistance = 0.0;
 
