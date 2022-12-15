@@ -89,6 +89,8 @@ public:
         sendSteer(INITIAL_STEER,true);
 
         setInitialStates();
+        safeMode = true;
+        setSecurityDistance(NS_DISTANCE);
 
     }
 
@@ -144,7 +146,7 @@ private:
             if (!hookDetected){
                 RCLCPP_INFO(this->get_logger(), "Hook detected");
                 hookDetected = true;
-                lowLevelSecurity = true;
+                setSecurityDistance(LLS_DISTANCE);
             }
             hookPos_x = hookMsg.x;
 
@@ -254,36 +256,21 @@ private:
 
         else{
 
-            if (lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >=0) && (frontObstacleDistance <= LLS_DISTANCE)){
+            if (currentVelocity > 0 && (frontObstacleDistance >=0) && (frontObstacleDistance <= securityDistance)){
                 obstacleDetected = true;
 
-            } else if (lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >=0) && (rearObstacleDistance <= LLS_DISTANCE)){
+            } else if (currentVelocity < 0 && (rearObstacleDistance >=0) && (rearObstacleDistance <= securityDistance)){
                 obstacleDetected = true;
             }
             
-            else if (!lowLevelSecurity && (currentVelocity > 0) && (frontObstacleDistance >= 0) && (frontObstacleDistance <= NS_DISTANCE)){
-                obstacleDetected = true;
-            }
 
-            else if (!lowLevelSecurity && (currentVelocity < 0) && (rearObstacleDistance >= 0) && (rearObstacleDistance <= NS_DISTANCE)){
-                obstacleDetected = true;
-            }
-
-
-            if(lowLevelSecurity && (targetVelocity > 0) && ((frontObstacleDistance==-1) || (frontObstacleDistance > LLS_DISTANCE))){
+            if(targetVelocity > 0 && ((frontObstacleDistance == -1) || (frontObstacleDistance > securityDistance))){
                 obstacleDetected = false;
 
-            }else if (lowLevelSecurity && (targetVelocity < 0) && ((rearObstacleDistance==-1) || (rearObstacleDistance > LLS_DISTANCE))){
+            }else if (targetVelocity < 0 && ((rearObstacleDistance == -1) || (rearObstacleDistance > securityDistance))){
                 obstacleDetected = false;
             }
 
-            else if (!lowLevelSecurity && (targetVelocity > 0) && ( (frontObstacleDistance == -1) || (frontObstacleDistance > NS_DISTANCE) )){
-                obstacleDetected = false;
-            }
-
-            else if (!lowLevelSecurity && (targetVelocity < 0) && ( (rearObstacleDistance == -1) || (rearObstacleDistance > NS_DISTANCE) )){
-                obstacleDetected = false;
-            }
 
         }
 
@@ -387,6 +374,15 @@ private:
 
         hookLocked = true;
         
+    }
+
+    void setSecurityDistance(int distance){
+
+        if (distance != securityDistance){
+            securityDistance = distance;
+            RCLCPP_INFO(this->get_logger(), "Security Distance : %d cm", securityDistance);
+        }
+
     }
     
     void setInitialStates(){
@@ -564,7 +560,6 @@ private:
         if (reverse && hookLocked && hookEnd){
             reverse = false;
             tow = true;
-            lowLevelSecurity = false;
             distanceTravelled = 0.0;
 
             printState = true;
@@ -647,10 +642,13 @@ private:
 
                 }else if (uTurn){
 
+                    
+
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> U-TURN");
                 
-                    safeMode = false;
+                    safeMode = true;
+                    setSecurityDistance(NS_DISTANCE);
 
                     if (distanceTravelled >= utTraj[currentPoint].distance){
 
@@ -707,6 +705,9 @@ private:
                         sendSteer(0.0,false);
 
                     }else if (hookDistance <= 50.0){
+
+                        setSecurityDistance(LLS_DISTANCE);
+
                         targetSteer = computeTargetAngle(usRearLeft,usRearRight);
 
                         if (hookLocked){
@@ -754,6 +755,7 @@ private:
                 sendSteer(0.0,false);
                 sleep(1.0);
                 lockHook();
+                setSecurityDistance(NS_DISTANCE);
                 hookEnd = true;
 
             }
@@ -800,7 +802,7 @@ private:
 
 
     //Security
-    bool lowLevelSecurity = false;
+    int securityDistance = 0;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
     bool currentSteerStop = false; //true => the steering movement is stopped

@@ -41,7 +41,7 @@
 // State machine
 #define INITIAL_STATE_MACHINE idle
 #define INITIAL_AUTONOMOUS move
-#define INITIAL_MOVE uTurn
+#define INITIAL_MOVE reverse
  
 
 #endif /*__motion_planning_node_HPP */
