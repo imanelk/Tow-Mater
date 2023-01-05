@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(interfaces)
+project(map_navigation)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -8,38 +8,27 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
+find_package(interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
-set(msg_files
-  "msg/JoystickOrder.msg"
-  "msg/MotorsOrder.msg"
-  "msg/MotorsFeedback.msg"
-  "msg/GeneralData.msg"
-  "msg/SteeringCalibration.msg"
-  "msg/Ultrasonic.msg"
-  "msg/Gnss.msg"
-  "msg/SystemCheck.msg"
-  "msg/Pid.msg"
-  "msg/Hook.msg"
-  "msg/CmdVel.msg"
-  "msg/CmdSteer.msg"
-  "msg/Obstacles.msg"
-  "msg/Distance.msg"
-  "msg/SegmentConfig.msg"
-  "msg/SegmentObstacle.msg"
-  "msg/Navigation.msg"
-  DEPENDENCIES geometry_msgs
-  DEPENDENCIES builtin_interfaces
+add_executable(map_navigation_node 
+  src/map_navigation_node.cpp
 )
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${msg_files}
-)
 
-ament_export_dependencies(rosidl_default_runtime)
+ament_target_dependencies(map_navigation_node rclcpp interfaces sensor_msgs std_srvs nav_msgs)
+ament_export_include_directories(include)
+
+target_include_directories(map_navigation_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(map_navigation_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+
+install(TARGETS map_navigation_node
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
