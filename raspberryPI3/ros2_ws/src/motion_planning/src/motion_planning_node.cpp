@@ -61,15 +61,11 @@ public:
 
         avoidanceTraj[0].velocity = 0.8;
         avoidanceTraj[0].angle = -1.0;
-        avoidanceTraj[0].distance = 100.0;
+        avoidanceTraj[0].distance = 150.0;
 
         avoidanceTraj[1].velocity = 0.8;
         avoidanceTraj[1].angle = 1.0;
-        avoidanceTraj[1].distance = 100.0;
-
-        avoidanceTraj[2].velocity = 0.8;
-        avoidanceTraj[2].angle = -1.0;
-        avoidanceTraj[2].distance = 50.0;
+        avoidanceTraj[1].distance = 250.0;
 
         avoidanceTraj[3].velocity = 0.0;
         avoidanceTraj[3].angle = 0.0;
