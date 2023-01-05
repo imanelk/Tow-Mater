@@ -57,6 +57,25 @@ public:
         utTraj[3].angle = 0.0;
         utTraj[3].distance = 0.0;
 
+        //Avoidance
+
+        avoidanceTraj[0].velocity = 0.8;
+        avoidanceTraj[0].angle = -1.0;
+        avoidanceTraj[0].distance = 100.0;
+
+        avoidanceTraj[1].velocity = 0.8;
+        avoidanceTraj[1].angle = 1.0;
+        avoidanceTraj[1].distance = 100.0;
+
+        avoidanceTraj[2].velocity = 0.8;
+        avoidanceTraj[2].angle = -1.0;
+        avoidanceTraj[2].distance = 50.0;
+
+        avoidanceTraj[3].velocity = 0.0;
+        avoidanceTraj[3].angle = 0.0;
+        avoidanceTraj[3].distance = 0.0;
+
+
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
         publisher_cmd_steer_= this->create_publisher<interfaces::msg::CmdSteer>("consign_steer", 10);
         publisher_cmd_hook_= this->create_publisher<interfaces::msg::Hook>("hook", 10);
@@ -515,6 +534,19 @@ private:
             move = true;
 
             printState = true;
+
+        } else if (emergency && frontFixedObstacle && tow){
+            emergency = false;
+            avoidance = true;
+
+            printState = true;
+        }
+
+        if (avoidance && avoidanceEnd){
+            move = true;
+            avoidance = false;
+
+            printState = true;
         }
 
         if (move && hookFdc && !hookLocked){
@@ -620,7 +652,7 @@ private:
                         } else{
                             distanceTravelled = 0;
                             currentPoint = 0;
-                            alignmentEnd = true;
+                            avoidanceEnd = true;
                             safeMode = true;
                             return ;
                         }
@@ -824,11 +856,11 @@ private:
     bool hookDetected = false;
 
     //States
-    bool analyse, noUturn, uTurn, reverse, tow, move, hooking, emergency, idle, manual, autonomous = false;
+    bool analyse, noUturn, uTurn, reverse, tow, move, hooking, emergency, idle, manual, autonomous, avoidance = false;
     bool printState = true; // If true, the current state is displayed in the terminal
 
     //Transitions
-    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd = false;
+    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd = false;
     bool hookLocked = true;
     //Trajectories
     float currentVelocity = 0.0;
@@ -848,6 +880,7 @@ private:
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
     VAD_POINT utTraj[NB_UT_POINTS];
+    VAD_POINT avoidanceTraj[NB_AVOIDANCE_POINTS];
 
     // Ultrasonic sensors
     int usRearLeft ;
@@ -858,6 +891,7 @@ private:
     int securityDistance = 0;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
+    bool frontFixedObstacle = false;
     bool currentSteerStop = false; //true => the steering movement is stopped
 
     //Distance

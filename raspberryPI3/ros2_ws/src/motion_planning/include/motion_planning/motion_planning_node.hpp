@@ -31,7 +31,8 @@
 
 #define NB_UT_POINTS 4
 
-
+// Avoidance
+#define NB_AVOIDANCE_POINTS 4
 
 // Security
 #define NS_DISTANCE 75 //NormalSecurity Distance [cm]
