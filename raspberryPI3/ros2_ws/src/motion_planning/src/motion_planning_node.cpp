@@ -69,7 +69,7 @@ public:
 
         avoidanceTraj[2].velocity = 0.8;
         avoidanceTraj[2].angle = +1.0;
-        avoidanceTraj[2].distance = 221.0;
+        avoidanceTraj[2].distance = 205.0;
 
         avoidanceTraj[3].velocity = 0.8;
         avoidanceTraj[3].angle = -1.0;
