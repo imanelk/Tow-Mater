@@ -168,15 +168,6 @@ private:
  
         distanceTravelled += distanceMsg.total - lastDistance;
         lastDistance = distanceMsg.total;
-
-        //RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-
-        // printDistance = distanceTravelled;
-        // if (printDistance >= 20.0){
-        //     printDistance = 0.0;
-        //     RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-        // }
-
     }
 
 
