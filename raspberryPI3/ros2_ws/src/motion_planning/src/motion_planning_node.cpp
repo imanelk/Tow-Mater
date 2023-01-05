@@ -597,7 +597,60 @@ private:
                 sendVel(0.0);
                 sendSteer(currentSteer,true);
 
+
+            } else if (avoidance){
+
+                if (printState)
+                    RCLCPP_WARN(this->get_logger(), "-> AVOIDANCE");
             
+                safeMode = true;
+                setSecurityDistance(NS_DISTANCE);
+
+                if (distanceTravelled >= avoidanceTraj[currentPoint].distance){
+
+                    if (currentPoint == (NB_AVOIDANCE_POINTS - 1)){    //Last point
+
+                        targetSteer = avoidanceTraj[currentPoint].angle;
+                        sendSteer(targetSteer, false);   //Turn steering
+
+                        if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                            targetVelocity = 0.0;   //Stop until targetSteer is reached
+                            sendVel(targetVelocity);
+
+                        } else{
+                            distanceTravelled = 0;
+                            currentPoint = 0;
+                            alignmentEnd = true;
+                            safeMode = true;
+                            return ;
+                        }
+
+                        
+                    }
+                    else{
+                        distanceTravelled = 0;
+
+                        targetVelocity = 0.0; //Stop
+                        sendVel(targetVelocity);
+
+                        currentPoint++; 
+                        
+                    }
+                }
+
+                targetSteer = avoidanceTraj[currentPoint].angle;
+                sendSteer(targetSteer, false);   //Turn steering
+
+                if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                    targetVelocity = 0.0;   //Stop until targetSteer is reached
+                    sendVel(targetVelocity);
+                
+                } else{
+                    targetVelocity = avoidanceTraj[currentPoint].velocity; 
+                    sendVel(targetVelocity);    //Send velocity
+                }
+
+
             } else if (move){
 
                 if (printState)
