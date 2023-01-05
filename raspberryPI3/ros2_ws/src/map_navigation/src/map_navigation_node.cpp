@@ -42,15 +42,16 @@ private:
         dclatitude = gnssDc.latitude;
         dclongitude = gnssDc.longitude;
         dcaltitude = gnssDc.altitude;
+        if (navigationMsg.start == false) {
+            navigationMsg.start = true;
+            navigationMsg.dclatitude = dclatitude;
+            navigationMsg.dclongitude = dclongitude;
+            navigationMsg.dcaltitude = dcaltitude;
+            
+            publisher_navigation_->publish(navigationMsg);
 
-        navigationMsg.start = true;
-        navigationMsg.dclatitude = dclatitude;
-        navigationMsg.dclongitude = dclongitude;
-        navigationMsg.dcaltitude = dcaltitude;
-        
-        publisher_navigation_->publish(navigationMsg);
-
-        RCLCPP_INFO(this->get_logger(), "GPS coordinations received, towing car intervention READY");
+            RCLCPP_INFO(this->get_logger(), "GPS coordinations received, towing car intervention READY");
+        }
     }
 
      
