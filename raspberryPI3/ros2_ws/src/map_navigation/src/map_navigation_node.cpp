@@ -50,12 +50,13 @@ private:
             navigationMsg.dclongitude = dclongitude;
             navigationMsg.dcaltitude = dcaltitude;
             modif = true;
+            RCLCPP_INFO(this->get_logger(), "GPS coordinations received OK");
         }
         
         if ((modif == true) && !(navigationMsg.start)) {
             navigationMsg.start = true;
             publisher_navigation_->publish(navigationMsg);
-            RCLCPP_INFO(this->get_logger(), "GPS coordinations received, towing car intervention READY");
+            RCLCPP_INFO(this->get_logger(), "Towing car ready to start OK");
         }
     }
 
