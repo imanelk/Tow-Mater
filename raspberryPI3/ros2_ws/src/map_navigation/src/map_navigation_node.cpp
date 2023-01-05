@@ -37,19 +37,24 @@ private:
     * 
     */
     void gnssDataCallback(const interfaces::msg::Gnss & gnssDc) {
-        auto navigationMsg = interfaces::msg::Navigation();    
+        auto navigationMsg = interfaces::msg::Navigation();  
+        bool modif = false;
 
         dclatitude = gnssDc.latitude;
         dclongitude = gnssDc.longitude;
         dcaltitude = gnssDc.altitude;
-        if (navigationMsg.start == false) {
-            navigationMsg.start = true;
+
+        if ((dclatitude != navigationMsg.dclatitude) || (dclongitude != navigationMsg.dclongitude) ||
+        (dcaltitude != navigationMsg.dcaltitude)) {
             navigationMsg.dclatitude = dclatitude;
             navigationMsg.dclongitude = dclongitude;
             navigationMsg.dcaltitude = dcaltitude;
-            
+            modif = true;
+        }
+        
+        if ((modif == true) && !(navigationMsg.start)) {
+            navigationMsg.start = true;
             publisher_navigation_->publish(navigationMsg);
-
             RCLCPP_INFO(this->get_logger(), "GPS coordinations received, towing car intervention READY");
         }
     }
@@ -62,6 +67,8 @@ private:
     float dclatitude;
     float dclongitude;
     float dcaltitude;
+
+    bool start;
 
     //Publishers
     rclcpp::Publisher<interfaces::msg::Navigation>::SharedPtr publisher_navigation_;
