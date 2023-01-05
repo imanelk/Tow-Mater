@@ -55,7 +55,8 @@
 extern CAN_HandleTypeDef hcan;
 
 /* USER CODE BEGIN Private defines */
-#define CAN_ID_MOTORS_DATA	0x200	// Odometry, Motors speed, Steering angle
+#define CAN_ID_MOTORS_DATA	0x200	// Motors speed, Steering angle
+#define CAN_ID_ODOMETRY	0x201		// Odometry
 #define CAN_ID_MOTORS_CMD 	0x100	// Speed and Steering Commands
 #define CAN_ID_HOOK	0x111
 #define CAN_ID_US1	0x211			//Front US [cm]

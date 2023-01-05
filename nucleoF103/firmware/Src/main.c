@@ -69,6 +69,7 @@ int UPDATE_CMD_FLAG = 1;
 int US_FLAG = 1;
 
 int CAN_SEND_MOTORS = 1;
+int CAN_SEND_ODOMETRY = 1;
 int CAN_SEND_US = 0;
 int CAN_SEND_BATT = 1;
 
@@ -383,12 +384,6 @@ int main(void)
         	//Motors data
         	CAN_SEND_MOTORS = 0;
 
-        	//Number of sensor pulses since last message (left rear wheel and right rear wheel)
-        	data[0] = nbImpulsionG;
-        	data[1] = nbImpulsionD;
-        	nbImpulsionG = 0;
-        	nbImpulsionD = 0;
-
             data[2] = (VMG_mes >> 8) & 0xFF; // Left Rear Speed MSB
             data[3] = VMG_mes & 0xFF; 	//LSB
             
@@ -400,6 +395,21 @@ int main(void)
             CAN_Send(data, CAN_ID_MOTORS_DATA);
 
          }
+
+		 if (CAN_SEND_ODOMETRY){
+
+			CAN_SEND_ODOMETRY = 0;
+
+			data[0] = (nbImpulsionG >> 8) & 0xFF; // nbImpulsionG MSB
+			data[1] = nbImpulsionG & 0xFF; 	//LSB
+
+			data[2] = (nbImpulsionD >> 8) & 0xFF; // nbImpulsionD MSB
+			data[3] = nbImpulsionD & 0xFF; // LSB
+
+			CAN_Send(data, CAN_ID_ODOMETRY);
+
+		 }
+
          if (CAN_SEND_BATT){
         	//Battery Level
 			CAN_SEND_BATT= 0;
