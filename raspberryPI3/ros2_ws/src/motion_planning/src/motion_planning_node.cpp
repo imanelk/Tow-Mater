@@ -61,15 +61,23 @@ public:
 
         avoidanceTraj[0].velocity = 0.8;
         avoidanceTraj[0].angle = -1.0;
-        avoidanceTraj[0].distance = 150.0;
+        avoidanceTraj[0].distance = 70.0;
 
         avoidanceTraj[1].velocity = 0.8;
-        avoidanceTraj[1].angle = 1.0;
-        avoidanceTraj[1].distance = 250.0;
+        avoidanceTraj[1].angle = 0.0;
+        avoidanceTraj[1].distance = 72.0;
 
-        avoidanceTraj[2].velocity = 0.0;
-        avoidanceTraj[2].angle = 0.0;
-        avoidanceTraj[2].distance = 0.0;
+        avoidanceTraj[2].velocity = 0.8;
+        avoidanceTraj[2].angle = +1.0;
+        avoidanceTraj[2].distance = 221.0;
+
+        avoidanceTraj[3].velocity = 0.8;
+        avoidanceTraj[3].angle = -1.0;
+        avoidanceTraj[3].distance = 100.0;
+
+        avoidanceTraj[4].velocity = 0.0;
+        avoidanceTraj[4].angle = 0.0;
+        avoidanceTraj[4].distance = 0.0;
 
 
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
