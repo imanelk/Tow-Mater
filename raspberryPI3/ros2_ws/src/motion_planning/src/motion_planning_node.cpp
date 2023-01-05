@@ -67,9 +67,9 @@ public:
         avoidanceTraj[1].angle = 1.0;
         avoidanceTraj[1].distance = 250.0;
 
-        avoidanceTraj[3].velocity = 0.0;
-        avoidanceTraj[3].angle = 0.0;
-        avoidanceTraj[3].distance = 0.0;
+        avoidanceTraj[2].velocity = 0.0;
+        avoidanceTraj[2].angle = 0.0;
+        avoidanceTraj[2].distance = 0.0;
 
 
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
@@ -632,7 +632,7 @@ private:
                     RCLCPP_WARN(this->get_logger(), "-> AVOIDANCE");
             
                 safeMode = true;
-                setSecurityDistance(NS_DISTANCE);
+                setSecurityDistance(LLS_DISTANCE);
 
                 if (distanceTravelled >= avoidanceTraj[currentPoint].distance){
 
