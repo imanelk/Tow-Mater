@@ -7,6 +7,7 @@
 #include "interfaces/msg/cmd_steer.hpp"
 #include "interfaces/msg/hook.hpp"
 #include "interfaces/msg/obstacles.hpp"
+#include "interfaces/msg/fixed_obstacles.hpp"
 #include "interfaces/msg/distance.hpp"
 #include "interfaces/msg/joystick_order.hpp"
 #include "interfaces/msg/motors_feedback.hpp"
@@ -96,6 +97,9 @@ public:
 
         subscription_obstacles_ = this->create_subscription<interfaces::msg::Obstacles>(
         "obstacle", 10, std::bind(&motion_planning::obstaclesCallback, this, _1));
+
+        subscription_fixed_obstacles_ = this->create_subscription<interfaces::msg::FixedObstacles>(
+        "fixed_obstacle", 10, std::bind(&motion_planning::fixedObstaclesCallback, this, _1));
 
         subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
@@ -242,6 +246,13 @@ private:
             rearObstacleDistance = *min_element(rearObstacles.begin(),rearObstacles.end());
         }
         
+    }
+
+
+    void fixedObstaclesCallback(const interfaces::msg::FixedObstacles & fixedObstacleMsg){
+
+        if (fixedObstacleMsg.fixed_obstacles[0] || fixedObstacleMsg.fixed_obstacles[1] || fixedObstacleMsg.fixed_obstacles[2] )
+            frontFixedObstacle = true;
     }
 
     /* Compute the steering angle for the final reverse  :
@@ -442,6 +453,7 @@ private:
         hookLocked = false;
         hookEnd = false;
         obstacleDetected = false;
+        frontFixedObstacle = false;
         towingEnd = false;
 
         safeMode = true;
@@ -531,6 +543,7 @@ private:
             move = false;
             emergency = true;
 
+            frontFixedObstacle = false;
             printState = true;
 
         } else if (emergency && (!obstacleDetected || !safeMode)){
@@ -657,6 +670,7 @@ private:
                             distanceTravelled = 0;
                             currentPoint = 0;
                             avoidanceEnd = true;
+                            frontFixedObstacle = false;
                             safeMode = true;
                             return ;
                         }
@@ -915,6 +929,7 @@ private:
     rclcpp::Subscription<interfaces::msg::MotorsFeedback>::SharedPtr subscription_motors_feedback_;
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
+    rclcpp::Subscription<interfaces::msg::FixedObstacles>::SharedPtr subscription_fixed_obstacles_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_ultrasonic_;
 
