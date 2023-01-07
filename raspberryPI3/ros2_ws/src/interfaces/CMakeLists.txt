@@ -31,6 +31,7 @@ set(msg_files
   "msg/SegmentConfig.msg"
   "msg/SegmentObstacle.msg"
   "msg/Navigation.msg"
+  "msg/FixedObstacles.msg"
   DEPENDENCIES geometry_msgs
   DEPENDENCIES builtin_interfaces
 )

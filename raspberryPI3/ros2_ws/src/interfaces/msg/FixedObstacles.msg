@@ -1,0 +1,4 @@
+float32 battery_level
+float32 temperature
+int16 pressure
+int8 humidity
