@@ -99,7 +99,7 @@ public:
         "obstacle", 10, std::bind(&motion_planning::obstaclesCallback, this, _1));
 
         subscription_fixed_obstacles_ = this->create_subscription<interfaces::msg::FixedObstacles>(
-        "fixed_obstacle", 10, std::bind(&motion_planning::fixedObstaclesCallback, this, _1));
+        "fixed_obstacles", 10, std::bind(&motion_planning::fixedObstaclesCallback, this, _1));
 
         subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
@@ -546,13 +546,19 @@ private:
             frontFixedObstacle = false;
             printState = true;
 
+        } else if (emergency && !obstacleDetected && avoidanceInProgress){
+            emergency = false;
+            avoidance = true;
+
+            printState = true;
+
         } else if (emergency && (!obstacleDetected || !safeMode)){
             emergency = false;
             move = true;
 
             printState = true;
 
-        } else if (emergency && frontFixedObstacle && tow){
+        } else if (emergency && frontFixedObstacle && tow && !avoidanceInProgress){
             emergency = false;
             avoidance = true;
 
@@ -562,6 +568,14 @@ private:
         if (avoidance && avoidanceEnd){
             move = true;
             avoidance = false;
+            avoidanceEnd = false;
+            avoidanceInProgress = false;
+
+            printState = true;
+
+        } else if (avoidance && safeMode && obstacleDetected && (securityDistance == LLS_DISTANCE)){
+            avoidance = false;
+            emergency = true;
 
             printState = true;
         }
@@ -649,6 +663,9 @@ private:
 
             } else if (avoidance){
 
+                //frontFixedObstacle = false;
+                avoidanceInProgress = true;
+
                 if (printState)
                     RCLCPP_WARN(this->get_logger(), "-> AVOIDANCE");
             
@@ -670,7 +687,7 @@ private:
                             distanceTravelled = 0;
                             currentPoint = 0;
                             avoidanceEnd = true;
-                            frontFixedObstacle = false;
+                            avoidanceInProgress = false;
                             safeMode = true;
                             return ;
                         }
@@ -835,6 +852,8 @@ private:
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> TOW");
 
+                    setSecurityDistance(NS_DISTANCE);
+
                     if (distanceTravelled < TOWING_DISTANCE){
                         targetVelocity = TOWING_VELOCITY;
                         sendVel(targetVelocity);
@@ -878,7 +897,7 @@ private:
     bool printState = true; // If true, the current state is displayed in the terminal
 
     //Transitions
-    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd = false;
+    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;
     bool hookLocked = true;
     //Trajectories
     float currentVelocity = 0.0;
