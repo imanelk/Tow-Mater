@@ -40,6 +40,7 @@ private:
     */
     void gnssDataCallback(const interfaces::msg::Gnss & gnssDc) {
         auto navigationMsg = interfaces::msg::Navigation();  
+        bool modif = false;
 
         dclatitude = gnssDc.latitude;
         dclongitude = gnssDc.longitude;
@@ -50,18 +51,14 @@ private:
             navigationMsg.dclatitude = dclatitude;
             navigationMsg.dclongitude = dclongitude;
             navigationMsg.dcaltitude = dcaltitude;
+            modif = true;
             RCLCPP_INFO(this->get_logger(), "GPS coordinations received OK");
         }
-        else {
-            RCLCPP_INFO(this->get_logger(), "NO MODIFICATION");
-        }
+
         
-        if (!start) {
+        if (!start && modif) {
             start = true;
             RCLCPP_INFO(this->get_logger(), "Towing car ready to start OK");
-        }
-        else {
-            RCLCPP_INFO(this->get_logger(), "NO PUBLICATION");
         }
 
         navigationMsg.start = start;
