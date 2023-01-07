@@ -52,13 +52,13 @@ private:
             navigationMsg.dclongitude = dclongitude;
             navigationMsg.dcaltitude = dcaltitude;
             modif = true;
-            RCLCPP_INFO(this->get_logger(), "GPS coordinations received OK");
+            // RCLCPP_INFO(this->get_logger(), "GPS coordinations updated OK");
         }
 
         
         if (!start && modif) {
             start = true;
-            RCLCPP_INFO(this->get_logger(), "Towing car ready to start OK");
+            RCLCPP_INFO(this->get_logger(), "GPS coordinates received, towing car ready to start OK");
         }
 
         navigationMsg.start = start;
