@@ -18,6 +18,8 @@ public:
     : Node("map_navigation_node")
     {
 
+        start = false;
+
         publisher_navigation_= this->create_publisher<interfaces::msg::Navigation>("navigation", 10);
 
     
@@ -38,7 +40,6 @@ private:
     */
     void gnssDataCallback(const interfaces::msg::Gnss & gnssDc) {
         auto navigationMsg = interfaces::msg::Navigation();  
-        bool modif = false;
 
         dclatitude = gnssDc.latitude;
         dclongitude = gnssDc.longitude;
@@ -49,21 +50,22 @@ private:
             navigationMsg.dclatitude = dclatitude;
             navigationMsg.dclongitude = dclongitude;
             navigationMsg.dcaltitude = dcaltitude;
-            modif = true;
             RCLCPP_INFO(this->get_logger(), "GPS coordinations received OK");
         }
         else {
             RCLCPP_INFO(this->get_logger(), "NO MODIFICATION");
         }
         
-        if (modif && !navigationMsg.start) {
-            navigationMsg.start = true;
-            publisher_navigation_->publish(navigationMsg);
+        if (!start) {
+            start = true;
             RCLCPP_INFO(this->get_logger(), "Towing car ready to start OK");
         }
         else {
             RCLCPP_INFO(this->get_logger(), "NO PUBLICATION");
         }
+
+        navigationMsg.start = start;
+        publisher_navigation_->publish(navigationMsg);
     }
 
      
