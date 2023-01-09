@@ -558,7 +558,7 @@ private:
 
             printState = true;
 
-        } else if (emergency && frontFixedObstacle && tow && !avoidanceInProgress){
+        } else if (emergency && frontFixedObstacle && frontObstacleDistance > MIN_DISTANCE_AVOIDANCE && tow && !avoidanceInProgress){
             emergency = false;
             avoidance = true;
 
