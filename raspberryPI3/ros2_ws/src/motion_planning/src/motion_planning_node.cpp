@@ -194,6 +194,7 @@ private:
     void distanceCallback(const interfaces::msg::Distance & distanceMsg){
  
         distanceTravelled += distanceMsg.total - lastDistance;
+        distanceTravelledAvoidance += distanceMsg.total - lastDistance;
         lastDistance = distanceMsg.total;
 
         //RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
@@ -445,6 +446,7 @@ private:
         hookDetected = false;
         hookDistance = 0.0;
         distanceTravelled = 0.0;
+        distanceTravelledAvoidance = 0.0;
         autoFailed = false;
         orientationOK = false;
         trajectoryOK = false;
@@ -562,6 +564,7 @@ private:
             emergency = false;
             avoidance = true;
 
+            distanceTravelledAvoidance = 0.0;
             printState = true;
         }
 
@@ -672,7 +675,7 @@ private:
                 safeMode = true;
                 setSecurityDistance(LLS_DISTANCE);
 
-                if (distanceTravelled >= avoidanceTraj[currentPoint].distance){
+                if (distanceTravelledAvoidance >= avoidanceTraj[currentPoint].distance){
 
                     if (currentPoint == (NB_AVOIDANCE_POINTS - 1)){    //Last point
 
@@ -684,7 +687,7 @@ private:
                             sendVel(targetVelocity);
 
                         } else{
-                            distanceTravelled = 0;
+                            distanceTravelledAvoidance = 0;
                             currentPoint = 0;
                             avoidanceEnd = true;
                             avoidanceInProgress = false;
@@ -695,7 +698,7 @@ private:
                         
                     }
                     else{
-                        distanceTravelled = 0;
+                        distanceTravelledAvoidance = 0;
 
                         targetVelocity = 0.0; //Stop
                         sendVel(targetVelocity);
@@ -933,6 +936,7 @@ private:
 
     //Distance
     float distanceTravelled = 0.0; //Distance measurement [cm]
+    float distanceTravelledAvoidance = 0.0;
     float lastDistance = 0.0; //Last total distance [cm]
     float printDistance = 0.0;
     float hookDistance = 0.0;
