@@ -179,38 +179,38 @@ class ObstacleDetection : public rclcpp::Node{
       if (l_motor == 0.0 && r_motor == 0.0){
         if(fixedObstacle_fl && obstacle_fl){
           fixedObstacleMsg.fixed_obstacles[0] = fixedObstacle_fl;
-          RCLCPP_INFO(this->get_logger(), "There is a fixed obstacle in zone 1");
+          RCLCPP_DEBUG(this->get_logger(), "There is a fixed obstacle in zone 1");
         }else if((!fixedObstacle_fl)){
           fixedObstacleMsg.fixed_obstacles[0] = fixedObstacle_fl;
         }
         if(fixedObstacle_fc && obstacle_fc){
           fixedObstacleMsg.fixed_obstacles[1] = fixedObstacle_fc;
-          RCLCPP_INFO(this->get_logger(), "There is a fixed obstacle in zone 2");
+          RCLCPP_DEBUG(this->get_logger(), "There is a fixed obstacle in zone 2");
         }else if(!(fixedObstacle_fc)){
           fixedObstacleMsg.fixed_obstacles[1] = fixedObstacle_fc;
         }
         if(fixedObstacle_fr && obstacle_fr){
           fixedObstacleMsg.fixed_obstacles[2] = fixedObstacle_fr;
-          RCLCPP_INFO(this->get_logger(), "There is a fixed obstacle in zone 3");
+          RCLCPP_DEBUG(this->get_logger(), "There is a fixed obstacle in zone 3");
         }else if(!(fixedObstacle_fr)){
           fixedObstacleMsg.fixed_obstacles[2] = fixedObstacle_fr;
         }
 
         if(fixedObstacle_rl && obstacle_rl){
           fixedObstacleMsg.fixed_obstacles[3] = fixedObstacle_rl;
-          RCLCPP_INFO(this->get_logger(), "There is a fixed obstacle in zone 4");
+          RCLCPP_DEBUG(this->get_logger(), "There is a fixed obstacle in zone 4");
         }else  if (!(fixedObstacle_rl)){
           fixedObstacleMsg.fixed_obstacles[3] = fixedObstacle_rl;
         }
         if(fixedObstacle_rc && obstacle_rc){
           fixedObstacleMsg.fixed_obstacles[4] = fixedObstacle_rc;
-          RCLCPP_INFO(this->get_logger(), "There is a fixed obstacle in zone 5");
+          RCLCPP_DEBUG(this->get_logger(), "There is a fixed obstacle in zone 5");
         }else  if (!(fixedObstacle_rc)){
           fixedObstacleMsg.fixed_obstacles[4] = fixedObstacle_rc;
         }
         if(fixedObstacle_rr && obstacle_rr){
           fixedObstacleMsg.fixed_obstacles[5] = fixedObstacle_rr;
-          RCLCPP_INFO(this->get_logger(), "There is a fixed obstacle in zone 6");
+          RCLCPP_DEBUG(this->get_logger(), "There is a fixed obstacle in zone 6");
         }else if (!(fixedObstacle_rr)){
           fixedObstacleMsg.fixed_obstacles[5] = fixedObstacle_rr;
         }
