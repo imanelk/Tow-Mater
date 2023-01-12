@@ -28,8 +28,21 @@ private:
 
     /* 
     */
-    void scanDataCallback(const interfaces::msg::Gnss & gnssDc) {
-        
+    void scanDataCallback(const sensor_msgs::msg::LaserScan & scan) {
+        int size;
+        int sum_left = 0;
+        int sum_right = 0;
+
+        size = sizeof scan.intensities/sizeof scan.intensities[0];
+        RCLCPP_INFO(this->get_logger(), "La taille du tablea est %d", size);
+
+        for(int i=0; i<= (int)size/2; i++){
+            sum_left = scan.intensities[i] + sum_left;
+        }
+        for(int i=(int)size/2; i<size; i++){
+            sum_right = scan.intensities[i] + sum_right;
+        }
+
       
     }
 
