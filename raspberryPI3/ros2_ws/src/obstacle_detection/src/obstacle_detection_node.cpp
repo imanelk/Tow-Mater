@@ -64,6 +64,7 @@ class ObstacleDetection : public rclcpp::Node{
     //Publishers
     rclcpp::Publisher<interfaces::msg::Obstacles>::SharedPtr publisher_obstacle_;
     rclcpp::Publisher<interfaces::msg::FixedObstacles>::SharedPtr publisher_fixed_obstacles_;
+    rclcpp::Publisher<interfaces::msg::ObstacleID>::SharedPtr publisher_obstacles_id;
     
     //Subscribers
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_us_data_;
@@ -111,7 +112,7 @@ class ObstacleDetection : public rclcpp::Node{
   
     void usDataCallback(const interfaces::msg::Ultrasonic & usMsg) {
 
-      // Message à publié
+      // Message à publier
       auto obstacleMsg = interfaces::msg::Obstacles();
 
       if (usMsg.front_left > OBSTACLE_PRESENT){
@@ -169,7 +170,7 @@ class ObstacleDetection : public rclcpp::Node{
 
     void motorsDataCallback(const interfaces::msg::MotorsFeedback & motorMsg) {
 
-      // Message à publié
+      // Message à publier
       auto fixedObstacleMsg = interfaces::msg::FixedObstacles();
 
       r_motor = motorMsg.right_rear_speed ;
@@ -290,6 +291,34 @@ class ObstacleDetection : public rclcpp::Node{
           fixedObstacle_rr = false;
         }
     }
+    void obstacleID(){
+      // Message à publier
+      auto obstacleIDMsg = interfaces::msg::ObstacleID();
+
+      if (fixedObstacle_fl && fixedObstacle_fc && fixedObstacle_fr){
+        obstacleIDMsg.obstacle_middle = true;
+        obstacleIDMsg.big_obstacle = true;
+      }else if (fixedObstacle_fl && fixedObstacle_fc){
+        obstacleIDMsg.obstacle_left = true;
+        obstacleIDMsg.big_obstacle = false;
+      }else if (fixedObstacle_fr && fixedObstacle_fc){
+        obstacleIDMsg.obstacle_right = true;
+        obstacleIDMsg.big_obstacle = false;
+      }else if (fixedObstacle_fl){
+        obstacleIDMsg.obstacle_left = true;
+        obstacleIDMsg.big_obstacle = false;
+      }else if (fixedObstacle_fc){
+        obstacleIDMsg.obstacle_middle = true;
+        obstacleIDMsg.big_obstacle = false;
+      }else if (fixedObstacle_fr){
+        obstacleIDMsg.obstacle_right = true;
+        obstacleIDMsg.big_obstacle = false;
+      }
+
+      // Message publication
+      publisher_obstacles_id->publish(obstacleIDMsg);
+    }
+
 };
 
 
