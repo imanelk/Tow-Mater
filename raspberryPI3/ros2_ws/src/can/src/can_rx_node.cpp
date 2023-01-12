@@ -30,15 +30,15 @@ public:
     can_rx()
     : Node("can_rx_node")
     {
-        publisher_us_ = this->create_publisher<interfaces::msg::Ultrasonic>("us_data", 10);
-        publisher_imu_raw_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data_raw", 10);
-        publisher_imu_mag_ = this->create_publisher<sensor_msgs::msg::MagneticField>("imu/mag", 10);
-        publisher_gnss_ = this->create_publisher<interfaces::msg::Gnss>("gnss_data", 10);
-        publisher_motorsFeedback_ = this->create_publisher<interfaces::msg::MotorsFeedback>("motors_feedback", 10);
-        publisher_generalData_ = this->create_publisher<interfaces::msg::GeneralData>("general_data", 10);
-        publisher_steeringCalibration_ = this->create_publisher<interfaces::msg::SteeringCalibration>("steering_calibration", 10);
-        publisher_systemCheck_ = this->create_publisher<interfaces::msg::SystemCheck>("system_check", 10);
-        publisher_hook_ = this->create_publisher<interfaces::msg::Hook>("hook", 10);
+        publisher_us_ = this->create_publisher<interfaces::msg::Ultrasonic>("us_data_dc", 10);
+        publisher_imu_raw_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data_raw_dc", 10);
+        publisher_imu_mag_ = this->create_publisher<sensor_msgs::msg::MagneticField>("imu/mag_dc", 10);
+        publisher_gnss_ = this->create_publisher<interfaces::msg::Gnss>("gnss_data_dc", 10);
+        publisher_motorsFeedback_ = this->create_publisher<interfaces::msg::MotorsFeedback>("motors_feedback_dc", 10);
+        publisher_generalData_ = this->create_publisher<interfaces::msg::GeneralData>("general_data_dc", 10);
+        publisher_steeringCalibration_ = this->create_publisher<interfaces::msg::SteeringCalibration>("steering_calibration_dc", 10);
+        publisher_systemCheck_ = this->create_publisher<interfaces::msg::SystemCheck>("system_check_dc", 10);
+        publisher_hook_ = this->create_publisher<interfaces::msg::Hook>("hook_dc", 10);
 
 
 

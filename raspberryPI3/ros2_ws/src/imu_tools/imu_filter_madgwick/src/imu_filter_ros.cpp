@@ -182,15 +182,15 @@ ImuFilterMadgwickRos::ImuFilterMadgwickRos(const rclcpp::NodeOptions &options)
         std::bind(&ImuFilterMadgwickRos::reconfigCallback, this, _1));
 
     // **** register publishers
-    imu_publisher_ = create_publisher<sensor_msgs::msg::Imu>("imu/data", 5);
+    imu_publisher_ = create_publisher<sensor_msgs::msg::Imu>("imu/data_dc", 5);
     if (publish_debug_topics_)
     {
         rpy_filtered_debug_publisher_ =
             create_publisher<geometry_msgs::msg::Vector3Stamped>(
-                "imu/rpy/filtered", 5);
+                "imu/rpy/filtered_dc", 5);
 
         rpy_raw_debug_publisher_ =
-            create_publisher<geometry_msgs::msg::Vector3Stamped>("imu/rpy/raw",
+            create_publisher<geometry_msgs::msg::Vector3Stamped>("imu/rpy/raw_dc",
                                                                  5);
     }
 
