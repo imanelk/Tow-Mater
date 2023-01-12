@@ -52,7 +52,7 @@ private:
         if (!start && modif) { // The first time we received GPS coordinates
             start = true; 
             RCLCPP_INFO(this->get_logger(), "GPS coordinates received, towing car ready to start OK");
-            RCLCPP_INFO(this->get_logger(), "The coordinates are  : %f , %f ", dclatitude, dclongitude);
+            RCLCPP_INFO(this->get_logger(), "The coordinates are  : [%f Lat, %f Long]", dclatitude, dclongitude);
         }
 
         navigationMsg.start = start;
