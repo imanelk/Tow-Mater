@@ -1,10 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
-
 #include "interfaces/msg/gnss.hpp"
 #include "interfaces/msg/navigation.hpp"
-
 #include "../include/map_navigation_node.h"
-
 
 
 using namespace std;
@@ -18,15 +15,13 @@ public:
     : Node("map_navigation_node")
     {
 
-        start = false;
+        start = false; // Variable used to identify the first time GPS coordinates are received 
 
         publisher_navigation_= this->create_publisher<interfaces::msg::Navigation>("navigation", 10);
 
-    
         subscription_gps_dc_ = this->create_subscription<interfaces::msg::Gnss>(
         "gnss_data_dc", 10, std::bind(&map_navigation::gnssDataCallback, this, _1));
 
-        
         RCLCPP_INFO(this->get_logger(), "map_navigation_node READY");
     }
 
@@ -52,13 +47,12 @@ private:
             navigationMsg.dclongitude = dclongitude;
             navigationMsg.dcaltitude = dcaltitude;
             modif = true;
-            // RCLCPP_INFO(this->get_logger(), "GPS coordinations updated OK");
         }
 
-        
-        if (!start && modif) {
-            start = true;
+        if (!start && modif) { // The first time we received GPS coordinates
+            start = true; 
             RCLCPP_INFO(this->get_logger(), "GPS coordinates received, towing car ready to start OK");
+            RCLCPP_INFO(this->get_logger(), "The coordinates are  : %f , %f ", dclatitude, dclongitude);
         }
 
         navigationMsg.start = start;
@@ -74,6 +68,7 @@ private:
     float dclongitude;
     float dcaltitude;
 
+    //Towing car state (true : mission started, false : idle state)
     bool start;
 
     //Publishers
