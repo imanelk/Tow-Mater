@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
@@ -27,7 +28,12 @@ set(msg_files
   "msg/CmdSteer.msg"
   "msg/Obstacles.msg"
   "msg/Distance.msg"
+  "msg/SegmentConfig.msg"
+  "msg/SegmentObstacle.msg"
   "msg/FixedObstacles.msg"
+  "msg/Navigation.msg"
+  DEPENDENCIES geometry_msgs
+  DEPENDENCIES builtin_interfaces
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
