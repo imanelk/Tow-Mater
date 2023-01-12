@@ -21,6 +21,8 @@
 #define TOWING_VELOCITY 1.0 // [m/s] 
 #define TOWING_DISTANCE 4000 // [cm]
 
+#define MIN_DISTANCE_AVOIDANCE 65 // minimum distance from the obstacle to start the avoidance process
+
 // ---- Trajectories
 
 // No U-turn (NUT)
@@ -31,7 +33,8 @@
 
 #define NB_UT_POINTS 4
 
-
+// Avoidance
+#define NB_AVOIDANCE_POINTS 5
 
 // Security
 #define NS_DISTANCE 75 //NormalSecurity Distance [cm]
@@ -41,7 +44,7 @@
 // State machine
 #define INITIAL_STATE_MACHINE idle
 #define INITIAL_AUTONOMOUS move
-#define INITIAL_MOVE uTurn
+#define INITIAL_MOVE tow
  
 
 #endif /*__motion_planning_node_HPP */

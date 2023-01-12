@@ -7,6 +7,7 @@
 #include "interfaces/msg/cmd_steer.hpp"
 #include "interfaces/msg/hook.hpp"
 #include "interfaces/msg/obstacles.hpp"
+#include "interfaces/msg/fixed_obstacles.hpp"
 #include "interfaces/msg/distance.hpp"
 #include "interfaces/msg/joystick_order.hpp"
 #include "interfaces/msg/motors_feedback.hpp"
@@ -57,6 +58,29 @@ public:
         utTraj[3].angle = 0.0;
         utTraj[3].distance = 0.0;
 
+        //Avoidance
+
+        avoidanceTraj[0].velocity = 0.8;
+        avoidanceTraj[0].angle = -1.0;
+        avoidanceTraj[0].distance = 70.0;
+
+        avoidanceTraj[1].velocity = 0.8;
+        avoidanceTraj[1].angle = 0.0;
+        avoidanceTraj[1].distance = 72.0;
+
+        avoidanceTraj[2].velocity = 0.8;
+        avoidanceTraj[2].angle = +1.0;
+        avoidanceTraj[2].distance = 205.0;
+
+        avoidanceTraj[3].velocity = 0.8;
+        avoidanceTraj[3].angle = -1.0;
+        avoidanceTraj[3].distance = 100.0;
+
+        avoidanceTraj[4].velocity = 0.0;
+        avoidanceTraj[4].angle = 0.0;
+        avoidanceTraj[4].distance = 0.0;
+
+
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
         publisher_cmd_steer_= this->create_publisher<interfaces::msg::CmdSteer>("consign_steer", 10);
         publisher_cmd_hook_= this->create_publisher<interfaces::msg::Hook>("hook", 10);
@@ -73,6 +97,9 @@ public:
 
         subscription_obstacles_ = this->create_subscription<interfaces::msg::Obstacles>(
         "obstacle", 10, std::bind(&motion_planning::obstaclesCallback, this, _1));
+
+        subscription_fixed_obstacles_ = this->create_subscription<interfaces::msg::FixedObstacles>(
+        "fixed_obstacles", 10, std::bind(&motion_planning::fixedObstaclesCallback, this, _1));
 
         subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
@@ -167,6 +194,7 @@ private:
     void distanceCallback(const interfaces::msg::Distance & distanceMsg){
  
         distanceTravelled += distanceMsg.total - lastDistance;
+        distanceTravelledAvoidance += distanceMsg.total - lastDistance;
         lastDistance = distanceMsg.total;
 
         //RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
@@ -219,6 +247,13 @@ private:
             rearObstacleDistance = *min_element(rearObstacles.begin(),rearObstacles.end());
         }
         
+    }
+
+
+    void fixedObstaclesCallback(const interfaces::msg::FixedObstacles & fixedObstacleMsg){
+
+        if (fixedObstacleMsg.fixed_obstacles[0] || fixedObstacleMsg.fixed_obstacles[1] || fixedObstacleMsg.fixed_obstacles[2] )
+            frontFixedObstacle = true;
     }
 
     /* Compute the steering angle for the final reverse  :
@@ -411,6 +446,7 @@ private:
         hookDetected = false;
         hookDistance = 0.0;
         distanceTravelled = 0.0;
+        distanceTravelledAvoidance = 0.0;
         autoFailed = false;
         orientationOK = false;
         trajectoryOK = false;
@@ -419,6 +455,7 @@ private:
         hookLocked = false;
         hookEnd = false;
         obstacleDetected = false;
+        frontFixedObstacle = false;
         towingEnd = false;
 
         safeMode = true;
@@ -508,11 +545,40 @@ private:
             move = false;
             emergency = true;
 
+            frontFixedObstacle = false;
+            printState = true;
+
+        } else if (emergency && !obstacleDetected && avoidanceInProgress){
+            emergency = false;
+            avoidance = true;
+
             printState = true;
 
         } else if (emergency && (!obstacleDetected || !safeMode)){
             emergency = false;
             move = true;
+
+            printState = true;
+
+        } else if (emergency && frontFixedObstacle && frontObstacleDistance > MIN_DISTANCE_AVOIDANCE && tow && !avoidanceInProgress){
+            emergency = false;
+            avoidance = true;
+
+            distanceTravelledAvoidance = 0.0;
+            printState = true;
+        }
+
+        if (avoidance && avoidanceEnd){
+            move = true;
+            avoidance = false;
+            avoidanceEnd = false;
+            avoidanceInProgress = false;
+
+            printState = true;
+
+        } else if (avoidance && safeMode && obstacleDetected && (securityDistance == LLS_DISTANCE)){
+            avoidance = false;
+            emergency = true;
 
             printState = true;
         }
@@ -597,7 +663,64 @@ private:
                 sendVel(0.0);
                 sendSteer(currentSteer,true);
 
+
+            } else if (avoidance){
+
+                //frontFixedObstacle = false;
+                avoidanceInProgress = true;
+
+                if (printState)
+                    RCLCPP_WARN(this->get_logger(), "-> AVOIDANCE");
             
+                safeMode = true;
+                setSecurityDistance(LLS_DISTANCE);
+
+                if (distanceTravelledAvoidance >= avoidanceTraj[currentPoint].distance){
+
+                    if (currentPoint == (NB_AVOIDANCE_POINTS - 1)){    //Last point
+
+                        targetSteer = avoidanceTraj[currentPoint].angle;
+                        sendSteer(targetSteer, false);   //Turn steering
+
+                        if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                            targetVelocity = 0.0;   //Stop until targetSteer is reached
+                            sendVel(targetVelocity);
+
+                        } else{
+                            distanceTravelledAvoidance = 0;
+                            currentPoint = 0;
+                            avoidanceEnd = true;
+                            avoidanceInProgress = false;
+                            safeMode = true;
+                            return ;
+                        }
+
+                        
+                    }
+                    else{
+                        distanceTravelledAvoidance = 0;
+
+                        targetVelocity = 0.0; //Stop
+                        sendVel(targetVelocity);
+
+                        currentPoint++; 
+                        
+                    }
+                }
+
+                targetSteer = avoidanceTraj[currentPoint].angle;
+                sendSteer(targetSteer, false);   //Turn steering
+
+                if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                    targetVelocity = 0.0;   //Stop until targetSteer is reached
+                    sendVel(targetVelocity);
+                
+                } else{
+                    targetVelocity = avoidanceTraj[currentPoint].velocity; 
+                    sendVel(targetVelocity);    //Send velocity
+                }
+
+
             } else if (move){
 
                 if (printState)
@@ -732,6 +855,8 @@ private:
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> TOW");
 
+                    setSecurityDistance(NS_DISTANCE);
+
                     if (distanceTravelled < TOWING_DISTANCE){
                         targetVelocity = TOWING_VELOCITY;
                         sendVel(targetVelocity);
@@ -771,11 +896,11 @@ private:
     bool hookDetected = false;
 
     //States
-    bool analyse, noUturn, uTurn, reverse, tow, move, hooking, emergency, idle, manual, autonomous = false;
+    bool analyse, noUturn, uTurn, reverse, tow, move, hooking, emergency, idle, manual, autonomous, avoidance = false;
     bool printState = true; // If true, the current state is displayed in the terminal
 
     //Transitions
-    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd = false;
+    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;
     bool hookLocked = true;
     //Trajectories
     float currentVelocity = 0.0;
@@ -795,6 +920,7 @@ private:
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
     VAD_POINT utTraj[NB_UT_POINTS];
+    VAD_POINT avoidanceTraj[NB_AVOIDANCE_POINTS];
 
     // Ultrasonic sensors
     int usRearLeft ;
@@ -805,10 +931,12 @@ private:
     int securityDistance = 0;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
+    bool frontFixedObstacle = false;
     bool currentSteerStop = false; //true => the steering movement is stopped
 
     //Distance
     float distanceTravelled = 0.0; //Distance measurement [cm]
+    float distanceTravelledAvoidance = 0.0;
     float lastDistance = 0.0; //Last total distance [cm]
     float printDistance = 0.0;
     float hookDistance = 0.0;
@@ -824,6 +952,7 @@ private:
     rclcpp::Subscription<interfaces::msg::MotorsFeedback>::SharedPtr subscription_motors_feedback_;
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
+    rclcpp::Subscription<interfaces::msg::FixedObstacles>::SharedPtr subscription_fixed_obstacles_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_ultrasonic_;
 
