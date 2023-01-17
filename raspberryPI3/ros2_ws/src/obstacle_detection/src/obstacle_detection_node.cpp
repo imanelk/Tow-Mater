@@ -54,7 +54,8 @@ class ObstacleDetection : public rclcpp::Node{
       //Subscribers 
       subscription_us_data_ = this->create_subscription<interfaces::msg::Ultrasonic>("us_data", 10, std::bind(&ObstacleDetection::usDataCallback, this, _1));
       subscription_motor_data_ = this->create_subscription<interfaces::msg::MotorsFeedback>("motors_feedback", 10, std::bind(&ObstacleDetection::motorsDataCallback, this, _1));
-
+      subscription_fixed_obstacles_= this->create_subscription<interfaces::msg::FixedObstacles>("fixed_obstacles", 10, std::bind(&ObstacleDetection::fixedObstaclesCallback, this, _1));
+      
       //This timer calls the methode counterToFive() each 1s
       timerFixedObstacle = this->create_wall_timer(PERIOD_UPDATED_COUNTER_OBSTACLE, std::bind(&ObstacleDetection::counterToFive, this));
       
@@ -71,7 +72,8 @@ class ObstacleDetection : public rclcpp::Node{
     //Subscribers
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_us_data_;
     rclcpp::Subscription<interfaces::msg::MotorsFeedback>::SharedPtr subscription_motor_data_;
-
+    rclcpp::Subscription<interfaces::msg::FixedObstacles>::SharedPtr subscription_fixed_obstacles_;
+    
     //Timers
     rclcpp::TimerBase::SharedPtr timerFixedObstacle;
 
@@ -294,38 +296,38 @@ class ObstacleDetection : public rclcpp::Node{
         }
     }
 
-    void obstacleID(){
+    void fixedObstaclesCallBack(const interfaces::msg::FixedObstacles & fixedObstaclesMsg){
       // Message à publier
       auto obstacleIDMsg = interfaces::msg::ObstaclesID();
 
-      if (fixedObstacle_fl && fixedObstacle_fc && fixedObstacle_fr){
+      if (fixedObstaclesMsg.fixed_obstacles[0] && fixedObstaclesMsg.fixed_obstacles[1] && fixedObstaclesMsg.fixed_obstacles[2]){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = true;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_right = false;
 
-      }else if (fixedObstacle_fl && fixedObstacle_fc){
+      }else if (fixedObstaclesMsg.fixed_obstacles[0] && fixedObstaclesMsg.fixed_obstacles[1]){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
         obstacleIDMsg.obstacle_right = false;
-      }else if (fixedObstacle_fc && fixedObstacle_fr){
+      }else if (fixedObstaclesMsg.fixed_obstacles[1] && fixedObstaclesMsg.fixed_obstacles[2]){
         obstacleIDMsg.obstacle_right = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_middle = false;
-      }else if (fixedObstacle_fl){
+      }else if (fixedObstaclesMsg.fixed_obstacles[0]){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
         obstacleIDMsg.obstacle_right = false;
         RCLCPP_INFO(this->get_logger(), "obstacle_fixed left =  value: %d",obstacleIDMsg.obstacle_left) ;
-      }else if (fixedObstacle_fc){
+      }else if (fixedObstaclesMsg.fixed_obstacles[1]){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_right = false;
-      }else if (fixedObstacle_fr){
+      }else if (fixedObstaclesMsg.fixed_obstacles[2]){
         obstacleIDMsg.obstacle_right = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
@@ -335,47 +337,6 @@ class ObstacleDetection : public rclcpp::Node{
       RCLCPP_INFO(this->get_logger(), "AVANT PUBLIER") ;
       publisher_obstacles_id_->publish(obstacleIDMsg);
     }
-    // void obstacleIDCallBack(const interfaces::msg::FixedObstacles & fixedObstaclesMsg){
-    //   // Message à publier
-    //   auto obstacleIDMsg = interfaces::msg::ObstaclesID();
-
-    //   if (fixedObstaclesMsg.fixed_obstacles[0] && fixedObstaclesMsg.fixed_obstacles[1] && fixedObstaclesMsg.fixed_obstacles[2]){
-    //     obstacleIDMsg.obstacle_middle = true;
-    //     obstacleIDMsg.big_obstacle = true;
-    //     obstacleIDMsg.obstacle_left = false;
-    //     obstacleIDMsg.obstacle_right = false;
-
-    //   }else if (fixedObstaclesMsg.fixed_obstacles[0] && fixedObstaclesMsg.fixed_obstacles[1]){
-    //     obstacleIDMsg.obstacle_left = true;
-    //     obstacleIDMsg.big_obstacle = false;
-    //     obstacleIDMsg.obstacle_middle = false;
-    //     obstacleIDMsg.obstacle_right = false;
-    //   }else if (fixedObstaclesMsg.fixed_obstacles[1] && fixedObstaclesMsg.fixed_obstacles[2]){
-    //     obstacleIDMsg.obstacle_right = true;
-    //     obstacleIDMsg.big_obstacle = false;
-    //     obstacleIDMsg.obstacle_left = false;
-    //     obstacleIDMsg.obstacle_middle = false;
-    //   }else if (fixedObstaclesMsg.fixed_obstacles[0]){
-    //     obstacleIDMsg.obstacle_left = true;
-    //     obstacleIDMsg.big_obstacle = false;
-    //     obstacleIDMsg.obstacle_middle = false;
-    //     obstacleIDMsg.obstacle_right = false;
-    //     RCLCPP_INFO(this->get_logger(), "obstacle_fixed left =  value: %d",obstacleIDMsg.obstacle_left) ;
-    //   }else if (fixedObstaclesMsg.fixed_obstacles[1]){
-    //     obstacleIDMsg.obstacle_middle = true;
-    //     obstacleIDMsg.big_obstacle = false;
-    //     obstacleIDMsg.obstacle_left = false;
-    //     obstacleIDMsg.obstacle_right = false;
-    //   }else if (fixedObstaclesMsg.fixed_obstacles[2]){
-    //     obstacleIDMsg.obstacle_right = true;
-    //     obstacleIDMsg.big_obstacle = false;
-    //     obstacleIDMsg.obstacle_left = false;
-    //     obstacleIDMsg.obstacle_middle = false;
-    //   }
-    //   // Message publication
-    //   RCLCPP_INFO(this->get_logger(), "AVANT PUBLIER") ;
-    //   publisher_obstacles_id_->publish(obstacleIDMsg);
-    // }
 
 };
 
