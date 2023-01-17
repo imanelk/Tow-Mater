@@ -54,7 +54,7 @@ class ObstacleDetection : public rclcpp::Node{
       //Subscribers 
       subscription_us_data_ = this->create_subscription<interfaces::msg::Ultrasonic>("us_data", 10, std::bind(&ObstacleDetection::usDataCallback, this, _1));
       subscription_motor_data_ = this->create_subscription<interfaces::msg::MotorsFeedback>("motors_feedback", 10, std::bind(&ObstacleDetection::motorsDataCallback, this, _1));
-      subscription_fixed_obstacles_= this->create_subscription<interfaces::msg::FixedObstacles>("fixed_obstacles", 10, std::bind(&ObstacleDetection::fixedObstaclesCallback, this, _1));
+      subscription_fixed_obstacles_= this->create_subscription<interfaces::msg::FixedObstacles>("fixed_obstacles", 10, std::bind(&ObstacleDetection::fixedObstaclesCallBack, this, _1));
       
       //This timer calls the methode counterToFive() each 1s
       timerFixedObstacle = this->create_wall_timer(PERIOD_UPDATED_COUNTER_OBSTACLE, std::bind(&ObstacleDetection::counterToFive, this));
