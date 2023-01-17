@@ -41,6 +41,7 @@ private:
         for (int i = 0; i < size; i++){
             objetfichier << scan.ranges[i] << endl;
         }
+        objetfichier << "fin de la boucle" << endl;
         objetfichier.close(); //on ferme le fichier pour liberer la mémoire 
           
         float left_distance = 0, right_distance = 0;
