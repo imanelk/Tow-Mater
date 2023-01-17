@@ -300,23 +300,35 @@ class ObstacleDetection : public rclcpp::Node{
       if (fixedObstacle_fl && fixedObstacle_fc && fixedObstacle_fr){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = true;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacles_right = false;
+
       }else if (fixedObstacle_fl && fixedObstacle_fc){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_middle = false;
+        obstacleIDMsg.obstacles_right = false;
       }else if (fixedObstacle_fr && fixedObstacle_fc){
         obstacleIDMsg.obstacle_right = true;
         obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacles_middle = false;
       }else if (fixedObstacle_fl){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_middle = false;
+        obstacleIDMsg.obstacles_right = false;
       }else if (fixedObstacle_fc){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacles_right = false;
       }else if (fixedObstacle_fr){
         obstacleIDMsg.obstacle_right = true;
         obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacles_middle = false;
       }
-
       // Message publication
       publisher_obstacles_id_->publish(obstacleIDMsg);
     }
