@@ -295,7 +295,7 @@ class ObstacleDetection : public rclcpp::Node{
     }
     void obstacleID(){
       // Message à publier
-      auto obstacleIDMsg = interfaces::msg::ObstacleID();
+      auto obstacleIDMsg = interfaces::msg::ObstaclesID();
 
       if (fixedObstacle_fl && fixedObstacle_fc && fixedObstacle_fr){
         obstacleIDMsg.obstacle_middle = true;
