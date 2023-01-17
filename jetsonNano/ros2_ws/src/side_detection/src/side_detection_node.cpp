@@ -32,34 +32,42 @@ private:
     */
     void scanDataCallback(const sensor_msgs::msg::LaserScan & scan) {
         auto sideMsg = interfaces::msg::ObstacleSide();  
-        int size;
-        int sum_left = 0;
-        int sum_right = 0;
-        float mean_left;
-        float mean_right;
+        int size = (int)scan.ranges.size();
+  
+        float left_distance = 0, right_distance = 0;
+        int left_count = 0, right_count = 0;
 
+         
+        RCLCPP_INFO(this->get_logger(), "La taille du tableau est : %d", size);
 
-        // Get the number of points get with the LiDAR
-        size = 1800; // sizeof scan.intensities/sizeof scan.intensities[0];
-        RCLCPP_INFO(this->get_logger(), "La  moitié de la taille du tableau est %d", (int)(size/2));
-
-
-        // Get the side where the intensity of the points is the highest
-        for(int i=0; i< (int)(size/2) ; i++){
-            sum_left = scan.intensities[i] + sum_left;
+        for (int i = 0; i < size; i++)
+        {
+            if (i < size / 2)
+            {
+                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max)
+                {
+                    left_distance += scan.ranges[i];
+                    left_count++;
+                }
+            }
+            else
+            {
+                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max)
+                {
+                    right_distance += scan.ranges[i];
+                    right_count++;
+                }
+            }
         }
-        for(int i=(int)(size/2); i<size; i++){
-            RCLCPP_INFO(this->get_logger(), "boucle/ i = %d ", i);
-            sum_right = scan.intensities[i] + sum_right;
-        }
-        RCLCPP_INFO(this->get_logger(), "Les sommes sont : %d (Left) et %d (right)", sum_left, sum_right);
 
-        mean_left = sum_left / (int)(size/2);
-        mean_right = sum_right / (int)(size/2);
+        left_distance /= left_count;
+        right_distance /= right_count;
 
-        RCLCPP_INFO(this->get_logger(), "Les moyennes sont : %f (Left) et %f (right)", mean_left, mean_right);
+        RCLCPP_INFO(this->get_logger(), "Left distance: %f, Right distance: %f", left_distance, right_distance);   
+        
 
-        if (mean_left >= mean_right){
+
+        if (left_distance >= right_distance){
             sideMsg.left_lidar = true;
             sideMsg.right_lidar = false;
         }
