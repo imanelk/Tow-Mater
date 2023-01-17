@@ -293,37 +293,37 @@ class ObstacleDetection : public rclcpp::Node{
           fixedObstacle_rr = false;
         }
     }
-    void obstacleID(){
+    void obstacleIDCallBack(const interfaces::msg::FixedObstacles & fixedObstaclesMsg){
       // Message à publier
       auto obstacleIDMsg = interfaces::msg::ObstaclesID();
 
-      if (fixedObstacle_fl && fixedObstacle_fc && fixedObstacle_fr){
+      if (fixedObstaclesMsg.fixed_obstacles[0] && fixedObstaclesMsg.fixed_obstacles[1] && fixedObstaclesMsg.fixed_obstacles[2]){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = true;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_right = false;
 
-      }else if (fixedObstacle_fl && fixedObstacle_fc){
+      }else if (fixedObstaclesMsg.fixed_obstacles[0] && fixedObstaclesMsg.fixed_obstacles[1]){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
         obstacleIDMsg.obstacle_right = false;
-      }else if (fixedObstacle_fr && fixedObstacle_fc){
+      }else if (fixedObstaclesMsg.fixed_obstacles[1] && fixedObstaclesMsg.fixed_obstacles[2]){
         obstacleIDMsg.obstacle_right = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_middle = false;
-      }else if (fixedObstacle_fl){
+      }else if (fixedObstaclesMsg.fixed_obstacles[0]){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
         obstacleIDMsg.obstacle_right = false;
-      }else if (fixedObstacle_fc){
+      }else if (fixedObstaclesMsg.fixed_obstacles[1]){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_right = false;
-      }else if (fixedObstacle_fr){
+      }else if (fixedObstaclesMsg.fixed_obstacles[2]){
         obstacleIDMsg.obstacle_right = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
