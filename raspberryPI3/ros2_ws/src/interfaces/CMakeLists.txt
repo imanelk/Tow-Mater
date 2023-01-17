@@ -30,6 +30,7 @@ set(msg_files
   "msg/Distance.msg"
   "msg/SegmentConfig.msg"
   "msg/SegmentObstacle.msg"
+  "msg/ObstacleSide.msg"
   DEPENDENCIES geometry_msgs
   DEPENDENCIES builtin_interfaces
 )
