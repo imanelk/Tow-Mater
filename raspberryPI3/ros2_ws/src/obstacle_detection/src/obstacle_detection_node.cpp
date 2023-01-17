@@ -318,7 +318,7 @@ class ObstacleDetection : public rclcpp::Node{
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
         obstacleIDMsg.obstacle_right = false;
-        RCLCPP_INFO(this->get_logger(), "obstacle_fixed left =  value: %d",obstacleIDMsg.obstacle_left ;
+        RCLCPP_INFO(this->get_logger(), "obstacle_fixed left =  value: %d",obstacleIDMsg.obstacle_left) ;
       }else if (fixedObstaclesMsg.fixed_obstacles[1]){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = false;
