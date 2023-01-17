@@ -40,7 +40,7 @@ private:
 
 
         // Get the number of points get with the LiDAR
-        size = sizeof scan.intensities/sizeof scan.intensities[0];
+        size = 1800 // sizeof scan.intensities/sizeof scan.intensities[0];
         RCLCPP_INFO(this->get_logger(), "La taille du tablea est %d", size);
 
 
