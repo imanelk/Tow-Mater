@@ -293,6 +293,7 @@ class ObstacleDetection : public rclcpp::Node{
           fixedObstacle_rr = false;
         }
     }
+
     void obstacleIDCallBack(const interfaces::msg::FixedObstacles & fixedObstaclesMsg){
       // Message à publier
       auto obstacleIDMsg = interfaces::msg::ObstaclesID();
@@ -331,6 +332,7 @@ class ObstacleDetection : public rclcpp::Node{
         obstacleIDMsg.obstacle_middle = false;
       }
       // Message publication
+      RCLCPP_INFO(this->get_logger(), "AVANT PUBLIER") ;
       publisher_obstacles_id_->publish(obstacleIDMsg);
     }
 
