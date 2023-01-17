@@ -34,49 +34,39 @@ private:
     */
     void scanDataCallback(const sensor_msgs::msg::LaserScan & scan) {
         auto sideMsg = interfaces::msg::ObstacleSide();  
-        int size = (int)scan.ranges.size();
-
-        
+        int size = (int)scan.ranges.size(); 
         float left_distance = 0, right_distance = 0;
         int left_count = 0, right_count = 0;
 
-         
-        RCLCPP_INFO(this->get_logger(), "La taille du tableau est : %d", size);
-
-        for (int i = 0; i < size; i++)
-        {
-            if ( 170 <= i && i< 528)
-            {
-                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max)
-                {
+        // Get the range values of the left and right sides
+        for (int i = 0; i < size; i++){
+            if ( 170 <= i && i< 528){
+                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
                     left_distance += scan.ranges[i];
                     left_count++;
                 }
             }
-            else
-            {
-                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max)
-                {
+            else{
+                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
                     right_distance += scan.ranges[i];
                     right_count++;
                 }
             }
         }
 
+        // Compute the means
         left_distance /= left_count;
         right_distance /= right_count;
 
-        RCLCPP_INFO(this->get_logger(), "Left distance: %f, Right distance: %f", left_distance, right_distance);   
-        
-
-
+       
+        // Compare left and right distances
         if (left_distance >= right_distance){
-            sideMsg.left_lidar = true;
-            sideMsg.right_lidar = false;
-        }
-        else{
             sideMsg.left_lidar = false;
             sideMsg.right_lidar = true;
+        }
+        else{
+            sideMsg.left_lidar = true;
+            sideMsg.right_lidar = false;
         }
 
         publisher_side_->publish(sideMsg);
