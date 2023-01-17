@@ -36,14 +36,7 @@ private:
         auto sideMsg = interfaces::msg::ObstacleSide();  
         int size = (int)scan.ranges.size();
 
-        ofstream objetfichier;
-        objetfichier.open("./scan.txt", ios::out); //on ouvrre le fichier en ecriture
-        for (int i = 0; i < size; i++){
-            objetfichier << scan.ranges[i] << endl;
-        }
-        objetfichier << "fin de la boucle" << endl;
-        objetfichier.close(); //on ferme le fichier pour liberer la mémoire 
-          
+        
         float left_distance = 0, right_distance = 0;
         int left_count = 0, right_count = 0;
 
@@ -52,7 +45,7 @@ private:
 
         for (int i = 0; i < size; i++)
         {
-            if (i < size / 2)
+            if ( 170 <= i && i< 528)
             {
                 if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max)
                 {
