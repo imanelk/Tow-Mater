@@ -314,7 +314,7 @@ class ObstacleDetection : public rclcpp::Node{
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_left = false;
         obstacleIDMsg.obstacle_middle = false;
-      }else if (ffixedObstacle_fl){
+      }else if (fixedObstacle_fl){
         obstacleIDMsg.obstacle_left = true;
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
