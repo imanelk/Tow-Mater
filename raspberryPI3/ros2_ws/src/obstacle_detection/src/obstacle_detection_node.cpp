@@ -6,6 +6,7 @@
 #include "interfaces/msg/obstacles.hpp"
 #include "interfaces/msg/fixed_obstacles.hpp"
 #include "interfaces/msg/motors_feedback.hpp"
+#include "interfaces/msg/obstacles_id.hpp"
 
 #include "../include/obstacle_detection/obstacle_detection_node.h"
 
@@ -48,6 +49,7 @@ class ObstacleDetection : public rclcpp::Node{
       //Publishers
       publisher_obstacle_= this->create_publisher<interfaces::msg::Obstacles>("obstacle", 10);
       publisher_fixed_obstacles_= this->create_publisher<interfaces::msg::FixedObstacles>("fixed_obstacles", 10);
+      publisher_obstacles_id_= this->create_publisher<interfaces::msg::ObstaclesID>("obstacles_id", 10);
 
       //Subscribers 
       subscription_us_data_ = this->create_subscription<interfaces::msg::Ultrasonic>("us_data", 10, std::bind(&ObstacleDetection::usDataCallback, this, _1));
@@ -64,7 +66,7 @@ class ObstacleDetection : public rclcpp::Node{
     //Publishers
     rclcpp::Publisher<interfaces::msg::Obstacles>::SharedPtr publisher_obstacle_;
     rclcpp::Publisher<interfaces::msg::FixedObstacles>::SharedPtr publisher_fixed_obstacles_;
-    rclcpp::Publisher<interfaces::msg::ObstacleID>::SharedPtr publisher_obstacles_id;
+    rclcpp::Publisher<interfaces::msg::ObstaclesID>::SharedPtr publisher_obstacles_id_;
     
     //Subscribers
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_us_data_;
@@ -316,7 +318,7 @@ class ObstacleDetection : public rclcpp::Node{
       }
 
       // Message publication
-      publisher_obstacles_id->publish(obstacleIDMsg);
+      publisher_obstacles_id_->publish(obstacleIDMsg);
     }
 
 };
