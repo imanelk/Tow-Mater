@@ -49,6 +49,7 @@ private:
             sum_left = scan.intensities[i] + sum_left;
         }
         for(int i=(int)(size/2); i<size; i++){
+            RCLCPP_INFO(this->get_logger(), "boucle/ i = %d ", i);
             sum_right = scan.intensities[i] + sum_right;
         }
         RCLCPP_INFO(this->get_logger(), "Les sommes sont : %d (Left) et %d (right)", sum_left, sum_right);
