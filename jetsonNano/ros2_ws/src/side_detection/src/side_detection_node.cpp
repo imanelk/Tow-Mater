@@ -41,7 +41,7 @@ private:
 
         // Get the range values of the left and right sides
         for (int i = 0; i < size; i++){
-            if ( 350 <= i && i< 528){ // back 170 - 350 and front 350 - 528
+            if ( 170 <= i && i< 350){ // back 170 - 350 and front 350 - 528
                 if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
                     left_distance += scan.ranges[i];
                     left_count++;
@@ -50,7 +50,7 @@ private:
                     left_min = scan.ranges[i];
                 }
             }
-            else if(528 <i && i<= size){ 
+            else if(0 <=i && i<= 170){ 
                 if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
                     right_distance += scan.ranges[i];
                     right_count++;
