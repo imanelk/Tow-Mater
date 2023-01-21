@@ -847,32 +847,54 @@ private:
 
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> NO U-TURN");
+                
+                    safeMode = true;
+                    setSecurityDistance(NS_DISTANCE);
 
-                    if (currentPoint == 0){
-                        sendSteer(nutTraj[currentPoint].angle, false);
-                        targetVelocity = nutTraj[currentPoint].velocity;
-                        sendVel(targetVelocity);
-                        
-                    }
-                    
                     if (distanceTravelled >= nutTraj[currentPoint].distance){
 
                         if (currentPoint == (NB_NUT_POINTS - 1)){    //Last point
-                            distanceTravelled = 0;
-                            currentPoint = 0;
-                            alignmentEnd = true;
-                            return ;
+
+                            targetSteer = nutTraj[currentPoint].angle;
+                            sendSteer(targetSteer, false);   //Turn steering
+
+                            if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                                targetVelocity = 0.0;   //Stop until targetSteer is reached
+                                sendVel(targetVelocity);
+
+                            } else{
+                                distanceTravelled = 0;
+                                currentPoint = 0;
+                                alignmentEnd = true;
+                                safeMode = true;
+                                return ;
+                            }
+
+                            
                         }
                         else{
                             distanceTravelled = 0;
 
-                            currentPoint++; 
-
-                            sendSteer(nutTraj[currentPoint].angle, false);
-                            targetVelocity = nutTraj[currentPoint].velocity;
+                            targetVelocity = 0.0; //Stop
                             sendVel(targetVelocity);
+
+                            currentPoint++; 
+                            
                         }
                     }
+
+                    targetSteer = nutTraj[currentPoint].angle;
+                    sendSteer(targetSteer, false);   //Turn steering
+
+                    if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                        targetVelocity = 0.0;   //Stop until targetSteer is reached
+                        sendVel(targetVelocity);
+                    
+                    } else{
+                        targetVelocity = nutTraj[currentPoint].velocity; 
+                        sendVel(targetVelocity);    //Send velocity
+                    }
+
 
                 }else if (uTurn){
 
