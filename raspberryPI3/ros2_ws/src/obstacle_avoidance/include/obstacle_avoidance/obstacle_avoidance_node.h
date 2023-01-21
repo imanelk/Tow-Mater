@@ -7,7 +7,7 @@
 
 #define PERIOD_UPDATE_CMD 1ms //Period to update proupulsion and steering command in [ms]
 
-#define AVOIDANCE_DISTANCE 3.00 //Minimum distance to avoid an obstacle [m]
+#define AVOIDANCE_DISTANCE 2.0 //Minimum distance to avoid an obstacle [m]
 
 
 
