@@ -44,7 +44,7 @@
 
 // State machine
 #define INITIAL_STATE_MACHINE idle
-#define INITIAL_AUTONOMOUS avoidance
+#define INITIAL_AUTONOMOUS move
 #define INITIAL_MOVE tow
  
 

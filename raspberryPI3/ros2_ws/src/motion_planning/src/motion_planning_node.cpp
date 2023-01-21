@@ -12,6 +12,7 @@
 #include "interfaces/msg/joystick_order.hpp"
 #include "interfaces/msg/motors_feedback.hpp"
 #include "interfaces/msg/ultrasonic.hpp"
+#include "interfaces/msg/avoidance_parameters.hpp"
 
 using namespace std;
 using placeholders::_1;
@@ -172,6 +173,9 @@ public:
         subscription_fixed_obstacles_ = this->create_subscription<interfaces::msg::FixedObstacles>(
         "fixed_obstacles", 10, std::bind(&motion_planning::fixedObstaclesCallback, this, _1));
 
+        subscription_avoidance_parameters_ = this->create_subscription<interfaces::msg::AvoidanceParameters>(
+        "avoidance_parameters", 10, std::bind(&motion_planning::avoidanceParametersCallback, this, _1));
+
         subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
 
@@ -273,14 +277,6 @@ private:
         distanceTravelledAvoidance += distanceMsg.total - lastDistance;
         lastDistance = distanceMsg.total;
 
-        //RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-
-        // printDistance = distanceTravelled;
-        // if (printDistance >= 20.0){
-        //     printDistance = 0.0;
-        //     RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-        // }
-
     }
 
 
@@ -330,6 +326,20 @@ private:
 
         if (fixedObstacleMsg.fixed_obstacles[0] || fixedObstacleMsg.fixed_obstacles[1] || fixedObstacleMsg.fixed_obstacles[2] )
             frontFixedObstacle = true;
+    }
+
+
+    void avoidanceParametersCallback(const interfaces::msg::AvoidanceParameters & avoidanceParamMsg){
+
+        if (avoidanceParamMsg.big && avoidanceParamMsg.left)
+            avoidanceChoice = "large left";
+        else if (avoidanceParamMsg.big && !avoidanceParamMsg.left)
+            avoidanceChoice = "large right";
+        else if (!avoidanceParamMsg.big && avoidanceParamMsg.left)
+            avoidanceChoice = "short left";
+        else if (!avoidanceParamMsg.big && !avoidanceParamMsg.left)
+            avoidanceChoice = "short right";
+
     }
 
     /* Compute the steering angle for the final reverse  :
@@ -647,6 +657,23 @@ private:
         } else if (emergency && frontFixedObstacle && frontObstacleDistance > MIN_DISTANCE_AVOIDANCE && tow && !avoidanceInProgress){
             emergency = false;
             avoidance = true;
+
+            if (avoidanceChoice == "large left"){
+                RCLCPP_INFO(this->get_logger(), "Large Left avoidance");
+                setAvoidanceTraj(largeLeftTraj);
+
+            }else if (avoidanceChoice == "short left"){
+                RCLCPP_INFO(this->get_logger(), "Short Left avoidance");
+                setAvoidanceTraj(shortLeftTraj);
+
+            }else if (avoidanceChoice == "large right"){
+                RCLCPP_INFO(this->get_logger(), "Large Right avoidance");
+                setAvoidanceTraj(largeRightTraj);
+
+            }else if (avoidanceChoice == "short right"){
+                RCLCPP_INFO(this->get_logger(), "Short Right avoidance");
+                setAvoidanceTraj(shortRightTraj);
+            }
 
             distanceTravelledAvoidance = 0.0;
             printState = true;
@@ -1007,6 +1034,7 @@ private:
 
     VAD_POINT avoidanceTraj[NB_AVOIDANCE_POINTS];
 
+    string avoidanceChoice;
 
     // Ultrasonic sensors
     int usRearLeft ;
@@ -1039,6 +1067,7 @@ private:
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
     rclcpp::Subscription<interfaces::msg::FixedObstacles>::SharedPtr subscription_fixed_obstacles_;
+    rclcpp::Subscription<interfaces::msg::AvoidanceParameters>::SharedPtr subscription_avoidance_parameters_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_ultrasonic_;
 
