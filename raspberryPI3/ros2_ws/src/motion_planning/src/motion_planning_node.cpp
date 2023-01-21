@@ -58,27 +58,98 @@ public:
         utTraj[3].angle = 0.0;
         utTraj[3].distance = 0.0;
 
-        //Avoidance
+        // --- Avoidance Trajectories---
 
-        avoidanceTraj[0].velocity = 0.8;
-        avoidanceTraj[0].angle = -1.0;
-        avoidanceTraj[0].distance = 70.0;
+        //Short Left
 
-        avoidanceTraj[1].velocity = 0.8;
-        avoidanceTraj[1].angle = 0.0;
-        avoidanceTraj[1].distance = 72.0;
+        shortLeftTraj[0].velocity = 0.8;
+        shortLeftTraj[0].angle = -1.0;
+        shortLeftTraj[0].distance = 70.0;
 
-        avoidanceTraj[2].velocity = 0.8;
-        avoidanceTraj[2].angle = +1.0;
-        avoidanceTraj[2].distance = 205.0;
+        shortLeftTraj[1].velocity = 0.8;
+        shortLeftTraj[1].angle = 0.0;
+        shortLeftTraj[1].distance = 72.0;
 
-        avoidanceTraj[3].velocity = 0.8;
-        avoidanceTraj[3].angle = -1.0;
-        avoidanceTraj[3].distance = 100.0;
+        shortLeftTraj[2].velocity = 0.8;
+        shortLeftTraj[2].angle = +1.0;
+        shortLeftTraj[2].distance = 205.0;
 
-        avoidanceTraj[4].velocity = 0.0;
-        avoidanceTraj[4].angle = 0.0;
-        avoidanceTraj[4].distance = 0.0;
+        shortLeftTraj[3].velocity = 0.8;
+        shortLeftTraj[3].angle = -1.0;
+        shortLeftTraj[3].distance = 100.0;
+
+        shortLeftTraj[4].velocity = 0.0;
+        shortLeftTraj[4].angle = 0.0;
+        shortLeftTraj[4].distance = 0.0;
+
+        //Short Right
+
+        shortRightTraj[0].velocity = 0.8;
+        shortRightTraj[0].angle = 1.0;
+        shortRightTraj[0].distance = 76.0;
+
+        shortRightTraj[1].velocity = 0.8;
+        shortRightTraj[1].angle = 0.0;
+        shortRightTraj[1].distance = 58.0;
+
+        shortRightTraj[2].velocity = 0.8;
+        shortRightTraj[2].angle = -1.0;
+        shortRightTraj[2].distance = 163.0;
+
+        shortRightTraj[3].velocity = 0.8;
+        shortRightTraj[3].angle = 1.0;
+        shortRightTraj[3].distance = 105.0;
+
+        shortRightTraj[4].velocity = 0.0;
+        shortRightTraj[4].angle = 0.0;
+        shortRightTraj[4].distance = 0.0;
+
+
+        // Large Left
+
+        largeLeftTraj[0].velocity = -0.8;
+        largeLeftTraj[0].angle = 1.0;
+        largeLeftTraj[0].distance = 40.0;
+
+        largeLeftTraj[1].velocity = 0.8;
+        largeLeftTraj[1].angle = -1.0;
+        largeLeftTraj[1].distance = 92.0;
+
+        largeLeftTraj[2].velocity = 0.8;
+        largeLeftTraj[2].angle = +1.0;
+        largeLeftTraj[2].distance = 273.0;
+
+        largeLeftTraj[3].velocity = 0.8;
+        largeLeftTraj[3].angle = -1.0;
+        largeLeftTraj[3].distance = 111.0;
+
+        largeLeftTraj[4].velocity = 0.0;
+        largeLeftTraj[4].angle = 0.0;
+        largeLeftTraj[4].distance = 0.0;
+
+        // Large Right
+
+        largeRightTraj[0].velocity = -0.8;
+        largeRightTraj[0].angle = -1.0;
+        largeRightTraj[0].distance = 40.0;
+
+        largeRightTraj[1].velocity = 0.8;
+        largeRightTraj[1].angle = 1.0;
+        largeRightTraj[1].distance = 89.0;
+
+        largeRightTraj[2].velocity = 0.8;
+        largeRightTraj[2].angle = -1.0;
+        largeRightTraj[2].distance = 216.0;
+
+        largeRightTraj[3].velocity = 0.8;
+        largeRightTraj[3].angle = 1.0;
+        largeRightTraj[3].distance = 111.0;
+
+        largeRightTraj[4].velocity = 0.0;
+        largeRightTraj[4].angle = 0.0;
+        largeRightTraj[4].distance = 0.0;
+
+        setAvoidanceTraj(shortLeftTraj);
 
 
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
@@ -124,6 +195,11 @@ public:
     
 private:
 
+    struct VAD_POINT {
+        float velocity;
+        float angle;
+        float distance;
+    };
 
     /* Update start and mode from joystick order [callback function]  :
     *
@@ -416,6 +492,14 @@ private:
         if (distance != securityDistance){
             securityDistance = distance;
             RCLCPP_INFO(this->get_logger(), "Security Distance : %d cm", securityDistance);
+        }
+
+    }
+
+    void setAvoidanceTraj (struct VAD_POINT * traj){
+
+        for (int i = 0; i < NB_AVOIDANCE_POINTS ;i++){
+            avoidanceTraj[i] = traj[i] ;
         }
 
     }
@@ -855,7 +939,7 @@ private:
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> TOW");
 
-                    setSecurityDistance(NS_DISTANCE);
+                    setSecurityDistance(TOW_DISTANCE);
 
                     if (distanceTravelled < TOWING_DISTANCE){
                         targetVelocity = TOWING_VELOCITY;
@@ -910,17 +994,19 @@ private:
     float feedbackSteer = 0.0;
     float hookPos_x = -1.0;
 
-    struct VAD_POINT {
-        float velocity;
-        float angle;
-        float distance;
-    };
-
     int currentPoint = 0;
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
     VAD_POINT utTraj[NB_UT_POINTS];
+
+
+    VAD_POINT shortLeftTraj[NB_AVOIDANCE_POINTS];
+    VAD_POINT largeLeftTraj[NB_AVOIDANCE_POINTS];
+    VAD_POINT shortRightTraj[NB_AVOIDANCE_POINTS];
+    VAD_POINT largeRightTraj[NB_AVOIDANCE_POINTS];
+
     VAD_POINT avoidanceTraj[NB_AVOIDANCE_POINTS];
+
 
     // Ultrasonic sensors
     int usRearLeft ;
