@@ -37,6 +37,7 @@ private:
         int size = (int)scan.ranges.size(); 
         float left_distance = 0, right_distance = 0;
         int left_count = 0, right_count = 0;
+        float left_min = 100.0; float right_min = 100.0; 
 
         // Get the range values of the left and right sides
         for (int i = 0; i < size; i++){
@@ -45,11 +46,17 @@ private:
                     left_distance += scan.ranges[i];
                     left_count++;
                 }
+                if (scan.ranges[i] < left_min){ // get the distance with the closest obstacle on the left
+                    left_min = scan.ranges[i];
+                }
             }
             else{
                 if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
                     right_distance += scan.ranges[i];
                     right_count++;
+                }
+                if (scan.ranges[i] < right_min){ // get the distance with the closest obstacle on the right
+                    right_min = scan.ranges[i];
                 }
             }
         }
@@ -68,6 +75,8 @@ private:
             sideMsg.left_lidar = true;
             sideMsg.right_lidar = false;
         }
+        sideMsg.left_min = left_min;
+        sideMsg.right_min = right_min;
 
         publisher_side_->publish(sideMsg);
     }
