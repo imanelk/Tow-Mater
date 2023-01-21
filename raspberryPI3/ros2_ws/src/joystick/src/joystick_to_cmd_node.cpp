@@ -34,6 +34,7 @@ public:
         start = false;
         systemCheckPrintRequest = false;
         reverse = false;
+        reset = false;
         requestedThrottle = STOP;
         requestedAngle = CENTER;
         
@@ -79,7 +80,8 @@ private:
         buttonStart = joy.buttons[buttonsMap.find("START")->second];
         buttonB = joy.buttons[buttonsMap.find("B")->second];    
         buttonA = joy.buttons[buttonsMap.find("A")->second];  
-        buttonY = joy.buttons[buttonsMap.find("Y")->second]; 
+        buttonY = joy.buttons[buttonsMap.find("Y")->second];
+        buttonX = joy.buttons[buttonsMap.find("X")->second]; 
         
 
         axisRT = joy.axes[axisMap.find("RT")->second];      //Motors (go forward)
@@ -141,6 +143,14 @@ private:
             start = true;
         }
 
+        //Autonomous reset
+        reset = buttonX;
+
+        if (reset){
+            start = false;
+            mode = 0;
+        }
+
 
         // ------ Propulsion ------
         if (axisLT > DEADZONE_LT_RT && axisRT > DEADZONE_LT_RT){  //Incompatible orders : Stop the car
@@ -175,6 +185,7 @@ private:
         joystickOrderMsg.throttle = requestedThrottle;
         joystickOrderMsg.steer  = requestedAngle;
         joystickOrderMsg.reverse = reverse;
+        joystickOrderMsg.reset = reset;
 
         publisher_joystick_order_->publish(joystickOrderMsg); //Send order to the car_control_node
     }
@@ -182,7 +193,7 @@ private:
     //Joystick variables
     map<string,int> axisMap;
     map<string,int> buttonsMap;
-    bool buttonB, buttonStart, buttonA, buttonY, buttonDpadBottom, buttonDpadLeft ;
+    bool buttonB, buttonStart, buttonA, buttonY, buttonX, buttonDpadBottom, buttonDpadLeft ;
     
     float axisRT, axisLT, axisLS_X;
 
@@ -195,6 +206,9 @@ private:
     //Manual mode variables
     float requestedAngle, requestedThrottle;
     bool reverse;
+
+    //Autonomous mode variable
+    bool reset;
 
 
 

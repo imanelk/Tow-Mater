@@ -39,13 +39,14 @@
 // Security
 #define NS_DISTANCE 75 //NormalSecurity Distance [cm]
 #define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
+#define AVOIDANCE_DISTANCE 25 //LowLevelSecurity Distance [cm]
 #define TOW_DISTANCE 100 //LowLevelSecurity Distance [cm]
 
 
 // State machine
 #define INITIAL_STATE_MACHINE idle
 #define INITIAL_AUTONOMOUS move
-#define INITIAL_MOVE noUturn
+#define INITIAL_MOVE analyse
  
 
 #endif /*__motion_planning_node_HPP */

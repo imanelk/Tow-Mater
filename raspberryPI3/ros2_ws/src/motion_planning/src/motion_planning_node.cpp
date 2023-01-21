@@ -13,6 +13,7 @@
 #include "interfaces/msg/motors_feedback.hpp"
 #include "interfaces/msg/ultrasonic.hpp"
 #include "interfaces/msg/avoidance_parameters.hpp"
+#include "interfaces/msg/orientation.hpp"
 
 using namespace std;
 using placeholders::_1;
@@ -182,6 +183,9 @@ public:
         subscription_ultrasonic_ = this->create_subscription<interfaces::msg::Ultrasonic>(
         "us_data", 10, std::bind(&motion_planning::ultrasonicCallback, this, _1));
 
+        subscription_orientation_ = this->create_subscription<interfaces::msg::Orientation>(
+        "orientation", 10, std::bind(&motion_planning::orientationCallback, this, _1));
+
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
  
         sleep(2);   //Waiting for car_control to start
@@ -192,7 +196,7 @@ public:
 
         setInitialStates();
         safeMode = true;
-        setSecurityDistance(NS_DISTANCE);
+        setSecurityDistance(NS_DISTANCE,NS_DISTANCE);
 
     }
 
@@ -218,6 +222,9 @@ private:
             manualMode = true;  //Manual Mode
         else if (joyOrder.mode == 1)
             manualMode = false; //Autonomous Mode
+
+        if (joyOrder.reset)
+            reset();
     }
 
     /* Update currentAngle from motors feedback [callback function]  :
@@ -227,6 +234,12 @@ private:
     */
     void motorsFeedbackCallback(const interfaces::msg::MotorsFeedback & motorsFeedback){
         feedbackSteer = motorsFeedback.steering_angle;
+    }
+
+
+    void orientationCallback(const interfaces::msg::Orientation & orientationMsg){
+        orientationOK = orientationMsg.same_orientation;
+        orientationReceived = true;
     }
 
 
@@ -253,7 +266,7 @@ private:
             if (!hookDetected){
                 RCLCPP_INFO(this->get_logger(), "Hook detected");
                 hookDetected = true;
-                setSecurityDistance(LLS_DISTANCE);
+                setSecurityDistance(NS_DISTANCE,LLS_DISTANCE);
             }
             hookPos_x = hookMsg.x;
 
@@ -377,18 +390,18 @@ private:
 
         else{
 
-            if (currentVelocity > 0 && (frontObstacleDistance >=0) && (frontObstacleDistance <= securityDistance)){
+            if (currentVelocity > 0 && (frontObstacleDistance >=0) && (frontObstacleDistance <= frontSecurityDistance)){
                 obstacleDetected = true;
 
-            } else if (currentVelocity < 0 && (rearObstacleDistance >=0) && (rearObstacleDistance <= securityDistance)){
+            } else if (currentVelocity < 0 && (rearObstacleDistance >=0) && (rearObstacleDistance <= backSecurityDistance)){
                 obstacleDetected = true;
             }
             
 
-            if(targetVelocity > 0 && ((frontObstacleDistance == -1) || (frontObstacleDistance > securityDistance))){
+            if(targetVelocity > 0 && ((frontObstacleDistance == -1) || (frontObstacleDistance > frontSecurityDistance))){
                 obstacleDetected = false;
 
-            }else if (targetVelocity < 0 && ((rearObstacleDistance == -1) || (rearObstacleDistance > securityDistance))){
+            }else if (targetVelocity < 0 && ((rearObstacleDistance == -1) || (rearObstacleDistance > backSecurityDistance))){
                 obstacleDetected = false;
             }
 
@@ -497,11 +510,16 @@ private:
         
     }
 
-    void setSecurityDistance(int distance){
+    void setSecurityDistance(int frontDistance, int backDistance){
 
-        if (distance != securityDistance){
-            securityDistance = distance;
-            RCLCPP_INFO(this->get_logger(), "Security Distance : %d cm", securityDistance);
+        if (frontDistance != frontSecurityDistance){
+            frontSecurityDistance = frontDistance;
+            RCLCPP_INFO(this->get_logger(), "Front Security Distance : %d cm", frontSecurityDistance);
+        }
+
+        if (backDistance != backSecurityDistance){
+            backSecurityDistance = backDistance;
+            RCLCPP_INFO(this->get_logger(), "Back Security Distance : %d cm", backSecurityDistance);
         }
 
     }
@@ -525,6 +543,9 @@ private:
 
     // Reset the state machine to the initial state
     void reset(){
+
+        RCLCPP_WARN(this->get_logger(),".... RESET ....");
+
         analyse = false;
         noUturn = false;
         uTurn = false;
@@ -543,7 +564,7 @@ private:
         distanceTravelledAvoidance = 0.0;
         autoFailed = false;
         orientationOK = false;
-        trajectoryOK = false;
+        orientationReceived = false;
         alignmentEnd = false;
         hookFdc = false;
         hookLocked = false;
@@ -553,6 +574,8 @@ private:
         towingEnd = false;
 
         safeMode = true;
+
+        start = false;
 
         setInitialStates();
     }
@@ -687,7 +710,7 @@ private:
 
             printState = true;
 
-        } else if (avoidance && safeMode && obstacleDetected && (securityDistance == LLS_DISTANCE)){
+        } else if (avoidance && safeMode && obstacleDetected && (frontSecurityDistance == AVOIDANCE_DISTANCE)){
             avoidance = false;
             emergency = true;
 
@@ -708,13 +731,13 @@ private:
             printState = true;
         }
 
-        if (analyse && trajectoryOK && !orientationOK){
+        if (analyse && !orientationOK && orientationReceived){
             analyse = false;
             uTurn = true;
 
             printState = true;
 
-        } else if (analyse && trajectoryOK && orientationOK){
+        } else if (analyse && orientationOK && orientationReceived){
             analyse = false;
             noUturn = true;
 
@@ -777,14 +800,13 @@ private:
 
             } else if (avoidance){
 
-                //frontFixedObstacle = false;
                 avoidanceInProgress = true;
 
                 if (printState)
                     RCLCPP_WARN(this->get_logger(), "-> AVOIDANCE");
             
                 safeMode = true;
-                setSecurityDistance(LLS_DISTANCE);
+                setSecurityDistance(AVOIDANCE_DISTANCE,LLS_DISTANCE);
 
                 if (distanceTravelledAvoidance >= avoidanceTraj[currentPoint].distance){
 
@@ -841,7 +863,7 @@ private:
 
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> ANALYSE");
-                    // ...
+                    
 
                 }else if (noUturn){
 
@@ -849,7 +871,7 @@ private:
                         RCLCPP_WARN(this->get_logger(), "--> NO U-TURN");
                 
                     safeMode = true;
-                    setSecurityDistance(NS_DISTANCE);
+                    setSecurityDistance(NS_DISTANCE,NS_DISTANCE);
 
                     if (distanceTravelled >= nutTraj[currentPoint].distance){
 
@@ -904,7 +926,7 @@ private:
                         RCLCPP_WARN(this->get_logger(), "--> U-TURN");
                 
                     safeMode = true;
-                    setSecurityDistance(NS_DISTANCE);
+                    setSecurityDistance(NS_DISTANCE,NS_DISTANCE);
 
                     if (distanceTravelled >= utTraj[currentPoint].distance){
 
@@ -962,7 +984,7 @@ private:
 
                     }else if (hookDistance <= 50.0){
 
-                        setSecurityDistance(LLS_DISTANCE);
+                        setSecurityDistance(NS_DISTANCE,LLS_DISTANCE);
 
                         targetSteer = computeTargetAngle(usRearLeft,usRearRight);
 
@@ -988,7 +1010,7 @@ private:
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> TOW");
 
-                    setSecurityDistance(TOW_DISTANCE);
+                    setSecurityDistance(TOW_DISTANCE,LLS_DISTANCE);
 
                     if (distanceTravelled < TOWING_DISTANCE){
                         targetVelocity = TOWING_VELOCITY;
@@ -1013,7 +1035,7 @@ private:
                 sendSteer(0.0,false);
                 sleep(1.0);
                 lockHook();
-                setSecurityDistance(NS_DISTANCE);
+                setSecurityDistance(NS_DISTANCE,LLS_DISTANCE);
                 hookEnd = true;
 
             }
@@ -1033,7 +1055,7 @@ private:
     bool printState = true; // If true, the current state is displayed in the terminal
 
     //Transitions
-    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;
+    bool start, manualMode, autoFailed, orientationOK, orientationReceived, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;
     bool hookLocked = true;
     //Trajectories
     float currentVelocity = 0.0;
@@ -1056,7 +1078,7 @@ private:
 
     VAD_POINT avoidanceTraj[NB_AVOIDANCE_POINTS];
 
-    string avoidanceChoice;
+    string avoidanceChoice = "short left";
 
     // Ultrasonic sensors
     int usRearLeft ;
@@ -1064,7 +1086,8 @@ private:
 
 
     //Security
-    int securityDistance = 0;
+    int frontSecurityDistance = 0;
+    int backSecurityDistance = 0;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
     bool frontFixedObstacle = false;
@@ -1092,6 +1115,7 @@ private:
     rclcpp::Subscription<interfaces::msg::AvoidanceParameters>::SharedPtr subscription_avoidance_parameters_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_ultrasonic_;
+    rclcpp::Subscription<interfaces::msg::Orientation>::SharedPtr subscription_orientation_;
 
     //Timers
     rclcpp::TimerBase::SharedPtr timer_motion_planning_;
