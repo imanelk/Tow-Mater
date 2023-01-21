@@ -113,9 +113,6 @@ private:
             }
 
         }
-        else{
-            RCLCPP_INFO(this->get_logger(), "[FAILED] No if cases considered ! ");
-        }
  
         publisher_avoidance_param_->publish(avoidanceParam);
     }

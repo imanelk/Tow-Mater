@@ -321,7 +321,7 @@ class ObstacleDetection : public rclcpp::Node{
         obstacleIDMsg.big_obstacle = false;
         obstacleIDMsg.obstacle_middle = false;
         obstacleIDMsg.obstacle_right = false;
-        RCLCPP_INFO(this->get_logger(), "obstacle_fixed left =  value: %d",obstacleIDMsg.obstacle_left) ;
+        // RCLCPP_INFO(this->get_logger(), "obstacle_fixed left =  value: %d",obstacleIDMsg.obstacle_left) ;
       }else if (fixedObstaclesMsg.fixed_obstacles[1]){
         obstacleIDMsg.obstacle_middle = true;
         obstacleIDMsg.big_obstacle = false;
@@ -334,7 +334,7 @@ class ObstacleDetection : public rclcpp::Node{
         obstacleIDMsg.obstacle_middle = false;
       }
       // Message publication
-      RCLCPP_INFO(this->get_logger(), "AVANT PUBLIER") ;
+      // RCLCPP_INFO(this->get_logger(), "AVANT PUBLIER") ;
       publisher_obstacles_id_->publish(obstacleIDMsg);
     }
 
