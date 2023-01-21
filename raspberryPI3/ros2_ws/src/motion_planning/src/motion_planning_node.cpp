@@ -854,10 +854,10 @@ private:
                         sendVel(targetVelocity);
                         
                     }
-
+                    
                     if (distanceTravelled >= nutTraj[currentPoint].distance){
 
-                        if (currentPoint == (NB_UT_POINTS - 1)){    //Last point
+                        if (currentPoint == (NB_NUT_POINTS - 1)){    //Last point
                             distanceTravelled = 0;
                             currentPoint = 0;
                             alignmentEnd = true;
@@ -868,8 +868,8 @@ private:
 
                             currentPoint++; 
 
-                            sendSteer(utTraj[currentPoint].angle, false);
-                            targetVelocity = utTraj[currentPoint].velocity;
+                            sendSteer(nutTraj[currentPoint].angle, false);
+                            targetVelocity = nutTraj[currentPoint].velocity;
                             sendVel(targetVelocity);
                         }
                     }
