@@ -41,9 +41,16 @@ def generate_launch_description():
     )
 
 
+    side_detection_node = Node(
+        package="side_detection",
+        executable="side_detection_node",
+        emulate_tty=True
+    )
+
     ld.add_action(lidar_node)
     ld.add_action(camera_node)
     ld.add_action(vision_node)
+    ld.add_action(side_detection_node)
     ld.add_action(system_check_ack_node)
 
     return ld
