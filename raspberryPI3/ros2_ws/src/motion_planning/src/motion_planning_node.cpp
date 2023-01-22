@@ -32,11 +32,11 @@ public:
 
         nutTraj[0].velocity = 0.8;
         nutTraj[0].angle = 1.0;
-        nutTraj[0].distance = 150.0;
+        nutTraj[0].distance = 161.0;
 
         nutTraj[1].velocity = 0.8;
         nutTraj[1].angle = -1.0;
-        nutTraj[1].distance = 175.0;
+        nutTraj[1].distance = 139.0;
 
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
@@ -46,15 +46,15 @@ public:
 
         utTraj[0].velocity = -0.8;
         utTraj[0].angle = -1.0;
-        utTraj[0].distance = 320.0;
+        utTraj[0].distance = 332.0;
 
         utTraj[1].velocity = 0.8;
         utTraj[1].angle = 1.0;
-        utTraj[1].distance = 191.0;
+        utTraj[1].distance = 187.0;
 
         utTraj[2].velocity = -0.8;
         utTraj[2].angle = -1.0;
-        utTraj[2].distance = 164.0;
+        utTraj[2].distance = 161.0;
 
         utTraj[3].velocity = 0.0;
         utTraj[3].angle = 0.0;

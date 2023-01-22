@@ -21,7 +21,7 @@
 #define TOWING_VELOCITY 1.0 // [m/s] 
 #define TOWING_DISTANCE 4000 // [cm]
 
-#define MIN_DISTANCE_AVOIDANCE 90 // minimum distance from the obstacle to start the avoidance process
+#define MIN_DISTANCE_AVOIDANCE 30 // minimum distance from the obstacle to start the avoidance process
 
 // ---- Trajectories
 
