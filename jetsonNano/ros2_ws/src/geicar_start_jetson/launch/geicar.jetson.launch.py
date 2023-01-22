@@ -17,7 +17,7 @@ def generate_launch_description():
             'frame_id': 'laser',
             'inverted': False,
             'angle_compensate': True,
-            'flip_x_axis': True,  # to get the front of the car in first
+            'flip_x_axis': False,  
         }],
         emulate_tty=True
     )
