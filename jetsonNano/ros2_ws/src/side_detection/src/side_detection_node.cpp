@@ -39,7 +39,7 @@ private:
         int left_count = 0, right_count = 0;
         float left_min = 100.0; float right_min = 100.0; 
 
-        // Get the range values of the left and right sides
+        // Get the range values of the front/left and front/right sides
         for (int i = 0; i < size; i++){
             if ( 0<= i && i < size/8){              // front/right
                 if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
