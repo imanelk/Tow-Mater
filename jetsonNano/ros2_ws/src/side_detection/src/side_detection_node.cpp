@@ -41,22 +41,22 @@ private:
 
         // Get the range values of the left and right sides
         for (int i = 0; i < size; i++){
-            if ( 0<= i && i < size/8){  // 2 : front/left
-                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
-                    left_distance += scan.ranges[i];
-                    left_count++;
-                }
-                if (scan.ranges[i] < left_min){ // get the distance with the closest obstacle on the left
-                    left_min = scan.ranges[i];
-                }
-            }
-            else if(3*size/8 <=i && i < size/2){  // B : front/right
+            if ( 0<= i && i < size/8){              // front/right
                 if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
                     right_distance += scan.ranges[i];
                     right_count++;
                 }
                 if (scan.ranges[i] < right_min){ // get the distance with the closest obstacle on the right
                     right_min = scan.ranges[i];
+                }
+            }
+            else if(3*size/8 <=i && i < size/2){    // front/left
+                if (scan.ranges[i] > 0 && scan.ranges[i] < scan.range_max){
+                    left_distance += scan.ranges[i];
+                    left_count++;
+                }
+                if (scan.ranges[i] < left_min){ // get the distance with the closest obstacle on the left
+                    left_min = scan.ranges[i];
                 }
             }
         }
