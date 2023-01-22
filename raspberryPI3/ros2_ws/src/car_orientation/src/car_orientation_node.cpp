@@ -59,6 +59,7 @@ private:
         geometry_msgs::msg::Vector3 meas;
         meas = MAG.magnetic_field;      
         direction = atan2(meas.y, meas.x) * rad2deg ;
+        RCLCPP_INFO(this->get_logger(), "Damaged car : %f - Towing car : %f", direction_dc, direction);
     }
 
     void magDcCallback(const sensor_msgs::msg::MagneticField & MAG){  
