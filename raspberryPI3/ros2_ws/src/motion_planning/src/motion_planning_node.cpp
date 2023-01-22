@@ -223,8 +223,8 @@ private:
         else if (joyOrder.mode == 1)
             manualMode = false; //Autonomous Mode
 
-        if (joyOrder.reset)
-            reset();
+        // if (joyOrder.reset)
+        //     reset();
     }
 
     /* Update currentAngle from motors feedback [callback function]  :
