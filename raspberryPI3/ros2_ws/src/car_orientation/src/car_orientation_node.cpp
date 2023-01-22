@@ -1,11 +1,10 @@
 #include "rclcpp/rclcpp.hpp"
 
-
 #include "../include/car_orientation_node.h"
-
 
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/magnetic_field.hpp"
+#include "interfaces/msg/orientation.hpp"
 
 using namespace std;
 using placeholders::_1;
@@ -18,16 +17,20 @@ public:
     : Node("car_orientation_node")
     {
 
-        start = false; // Variable used to identify the first time GPS coordinates are received 
+        publisher_orientation_= this->create_publisher<interfaces::msg::Orientation>("orientation", 10);
 
-        publisher_navigation_= this->create_publisher<interfaces::msg::Navigation>("navigation", 10);
+
+        subscription_magnetic_dc_ = this->create_subscription<sensor_msgs::msg::MagneticField>(
+        "imu/mag_dc", 10, std::bind(&car_orientation::magDcCallback, this, _1));
+
+        subscription_imu_dc_ = this->create_subscription<sensor_msgs::msg::Imu>(
+        "imu/data_raw", 10, std::bind(&car_orientation::imuDcCallback, this, _1));
+
+        subscription_magnetic_ = this->create_subscription<sensor_msgs::msg::MagneticField>(
+        "imu/mag", 10, std::bind(&car_orientation::magCallback, this, _1));
 
         subscription_imu_ = this->create_subscription<sensor_msgs::msg::Imu>(
-        "imu/data_raw", 10, std::bind(&motion_planning::imuCallback, this, _1));
-
-         subscription_magnetic_ = this->create_subscription<sensor_msgs::msg::MagneticField>(
-        "imu/mag", 10, std::bind(&motion_planning::magCallback, this, _1));
-
+        "imu/data_raw", 10, std::bind(&car_orientation::imuCallback, this, _1));
 
         RCLCPP_INFO(this->get_logger(), "car_orientation_node READY");
     }
@@ -37,23 +40,30 @@ private:
 
 
     void imuCallback(const sensor_msgs::msg::Imu & IMU){
-        quaternion_to_euler(IMU.orientation) ;
-    }
-    
-    void quaternion_to_euler(geometry_msgs::msg::Quaternion q)
-    {
+        geometry_msgs::msg::Quaternion q;
+        q = IMU.orientation;
         phi = atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y));
         theta = asin(2 * (q.w * q.y - q.z * q.x));
         psi = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
     }
-
-    void magCallback(const sensor_msgs::msg::MagneticField & MAG){
-        
-        magnetic_field_compass(MAG.magnetic_field) ;
+    
+    void imuDcCallback(const sensor_msgs::msg::Imu & IMU){
+        geometry_msgs::msg::Quaternion q;
+        q = IMU.orientation;
+        phi_dc = atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y));
+        theta_dc = asin(2 * (q.w * q.y - q.z * q.x));
+        psi_dc = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
     }
-    void magnetic_field_compass(geometry_msgs::msg::Vector3 meas)
-    {
+    
+    void magCallback(const sensor_msgs::msg::MagneticField & MAG){  
+        geometry_msgs::msg::Vector3 meas;
+        meas = MAG.magnetic_field;      
         direction = atan2(meas.y, meas.x) * rad2deg ;
+    }
+
+    void magDcCallback(const sensor_msgs::msg::MagneticField & MAG){  
+        geometry_msgs::msg::Vector3 meas = MAG.magnetic_field;      
+        direction_dc = atan2(meas.y, meas.x) * rad2deg ;
     }
 
      
@@ -65,19 +75,28 @@ private:
     float phi ;
     float theta ;
     float psi ;
-
     float direction ;
+
+    float phi_dc ;
+    float theta_dc ;
+    float psi_dc ;
+    float direction_dc ;
+
+    // Constants
     float pi = 3.14159265359 ;
-    float rad2deg = 180 / pi ;
+    float rad2deg = 180 / pi;
 
 
-    //Publishers
-    rclcpp::Publisher<interfaces::msg::Navigation>::SharedPtr publisher_navigation_;
+    //Publisher
+    rclcpp::Publisher<interfaces::msg::Orientation>::SharedPtr publisher_orientation_;
+
 
     //Subscribers
+    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_dc_;
+    rclcpp::Subscription<sensor_msgs::msg::MagneticField>::SharedPtr subscription_magnetic_dc_;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_;
     rclcpp::Subscription<sensor_msgs::msg::MagneticField>::SharedPtr subscription_magnetic_;
-    
+
     //Timer
     rclcpp::TimerBase::SharedPtr timer_;
 
