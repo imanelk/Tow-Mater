@@ -32,13 +32,20 @@ public:
         subscription_imu_ = this->create_subscription<sensor_msgs::msg::Imu>(
         "imu/data_raw", 10, std::bind(&car_orientation::imuCallback, this, _1));
 
+        timer_ = this->create_wall_timer(PERIOD_UPDATE_CMD, std::bind(&car_orientation::updateDirection, this));
+
+
         RCLCPP_INFO(this->get_logger(), "car_orientation_node READY");
     }
 
     
 private:
 
-
+    /* Update phi, theta and psi from IMU [callback function]  :
+    *
+    * This function is called when a message is published on the "/imu/data_raw" topic
+    * 
+    */
     void imuCallback(const sensor_msgs::msg::Imu & IMU){
         geometry_msgs::msg::Quaternion q;
         q = IMU.orientation;
@@ -47,6 +54,11 @@ private:
         psi = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
     }
     
+    /* Update phi_dc, theta_dc and psi_dc from IMU [callback function]  :
+    *
+    * This function is called when a message is published on the "/imu/data_raw_dc" topic
+    * 
+    */
     void imuDcCallback(const sensor_msgs::msg::Imu & IMU){
         geometry_msgs::msg::Quaternion q;
         q = IMU.orientation;
@@ -55,17 +67,47 @@ private:
         psi_dc = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
     }
     
+    /* Update direction from IMU [callback function]  :
+    *
+    * This function is called when a message is published on the "/imu/mag" topic
+    * 
+    */
     void magCallback(const sensor_msgs::msg::MagneticField & MAG){  
         geometry_msgs::msg::Vector3 meas;
         meas = MAG.magnetic_field;      
         direction = atan2(meas.y, meas.x) * rad2deg ;
-        RCLCPP_INFO(this->get_logger(), "Towing car : %f", direction);
     }
 
+    /* Update direction_dc from IMU [callback function]  :
+    *
+    * This function is called when a message is published on the "/imu/mag_dc" topic
+    * 
+    */
     void magDcCallback(const sensor_msgs::msg::MagneticField & MAG){  
         geometry_msgs::msg::Vector3 meas = MAG.magnetic_field;      
         direction_dc = atan2(meas.y, meas.x) * rad2deg ;
-        RCLCPP_INFO(this->get_logger(), "Damaged car : %f ", direction_dc);
+    }
+
+
+    /* 
+    *
+    * This function compares the two cars (towing and damaged) directions
+    * and publish on the /orientation topic the information
+    * 
+    */
+    void updateDirection(){
+        auto orientation = interfaces::msg::Orientation();
+
+        RCLCPP_INFO(this->get_logger(), "Towing car : %f - Damaged car : %f ", direction, direction_dc);
+
+        if (direction - THRESHOLD <= direction_dc && direction + THRESHOLD >= direction_dc){
+            orientation.same_orientation = true;
+        }
+        else {
+            orientation.same_orientation = false;
+        }
+
+        publisher_orientation_->publish(orientation);
     }
 
      
