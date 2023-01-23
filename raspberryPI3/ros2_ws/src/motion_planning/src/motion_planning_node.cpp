@@ -284,7 +284,7 @@ private:
 
     }
 
-    /* Update currentAngle from motors feedback [callback function]  :
+    /* Update feedbackSteer from motors feedback [callback function]  :
     *
     * This function is called when a message is published on the "/motors_feedback" topic
     * 
@@ -293,7 +293,12 @@ private:
         feedbackSteer = motorsFeedback.steering_angle;
     }
 
-
+    /* Update orientationOK and orientationReceived [callback function]  :
+    *
+    * This function is called when a message is published on the "/orientation" topic
+    * The two cars are in the same orientation => orientationOK = true => no U-turn
+    * The two cars are not in the same orientation => orientationOK = false => U-turn
+    */
     void orientationCallback(const interfaces::msg::Orientation & orientationMsg){
         orientationOK = orientationMsg.same_orientation;
         orientationReceived = true;
@@ -303,7 +308,7 @@ private:
     /* Update usRearLeft and usRearRight from ultrasonic feedback [callback function]  :
     *
     * This function is called when a message is published on the "/ultrasonic" topic
-    * 
+    * usRearLeft and usRearRight are used to correct the final reverse trajectory
     */
     void ultrasonicCallback(const interfaces::msg::Ultrasonic & usonic){
         usRearLeft = usonic.rear_left ;
@@ -328,10 +333,10 @@ private:
             hookPos_x = hookMsg.x;
 
 
-            hookDistance = 40.0;
+            hookDistance = 40.0;    //TO-DO : Get the real value
 
         } else if (hookMsg.type == "fdc")
-            hookFdc = hookMsg.status;
+            hookFdc = hookMsg.status;   //End of course
         
     }
 
@@ -653,7 +658,7 @@ private:
         orientationReceived = false;
         alignmentEnd = false;
         hookFdc = false;
-        hookLocked = false;
+        hookLocked = true;
         hookEnd = false;
         obstacleDetected = false;
         frontFixedObstacle = false;
