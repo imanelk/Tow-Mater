@@ -24,7 +24,7 @@ public:
         "imu/mag_dc", 10, std::bind(&car_orientation::magDcCallback, this, _1));
 
         subscription_imu_dc_ = this->create_subscription<sensor_msgs::msg::Imu>(
-        "imu/data_raw", 10, std::bind(&car_orientation::imuDcCallback, this, _1));
+        "imu/data_raw_dc", 10, std::bind(&car_orientation::imuDcCallback, this, _1));
 
         subscription_magnetic_ = this->create_subscription<sensor_msgs::msg::MagneticField>(
         "imu/mag", 10, std::bind(&car_orientation::magCallback, this, _1));
@@ -74,8 +74,8 @@ private:
     */
     void magCallback(const sensor_msgs::msg::MagneticField MAG){  
 
-        update_min_max_dc(MAG.magnetic_field) ;
-        correct_mag_dc(MAG.magnetic_field) ;    
+        update_min_max(MAG.magnetic_field) ;
+        correct_mag(MAG.magnetic_field) ;    
         direction = atan2(corrected_y, corrected_x) * rad2deg ;
     }
 
