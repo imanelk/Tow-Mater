@@ -336,7 +336,7 @@ private:
             hookDistance = 40.0;    //TO-DO : Get the real value
 
         } else if (hookMsg.type == "fdc")
-            hookFdc = hookMsg.status;   //End of course
+            hookFdc = hookMsg.status;   //End of course sensor
         
     }
 
@@ -396,14 +396,22 @@ private:
         
     }
 
-
+    /* Update frontFixedObstacle from fixed_obstacles feedback [callback function]  :
+    *
+    * This function is called when a message is published on the "/front_obstacles" topic
+    * 
+    */
     void fixedObstaclesCallback(const interfaces::msg::FixedObstacles & fixedObstacleMsg){
 
         if (fixedObstacleMsg.fixed_obstacles[0] || fixedObstacleMsg.fixed_obstacles[1] || fixedObstacleMsg.fixed_obstacles[2] )
             frontFixedObstacle = true;
     }
 
-
+    /* Update avoidanceChoice from avoidance feedback [callback function]  :
+    *
+    * This function is called when a message is published on the "/avoidance_parameters" topic
+    * 
+    */
     void avoidanceParametersCallback(const interfaces::msg::AvoidanceParameters & avoidanceParamMsg){
 
         if (avoidanceParamMsg.big && avoidanceParamMsg.left)
@@ -507,6 +515,7 @@ private:
 
     /* Publish the steering angle on the /consign_steer topic
     * If the angle is the same as the current one : the angle is not published
+    * If steerStop = true, the steering motor is stopped
     */
     void sendSteer(float angle, bool steerStop){
 
@@ -572,6 +581,9 @@ private:
         
     }
 
+    /* Change the securityDistance
+    *
+    */
     void setSecurityDistance(int frontDistance, int backDistance){
 
         if (frontDistance != frontSecurityDistance){
@@ -586,6 +598,9 @@ private:
 
     }
 
+    /* Set the avoidance trajectory
+    *
+    */
     void setAvoidanceTraj (struct VAD_POINT * traj){
 
         for (int i = 0; i < NB_AVOIDANCE_POINTS ;i++){
@@ -603,6 +618,9 @@ private:
         printState = true;
     }
 
+    /* Change the current state, called when mode = 4 (SELECT mode). See joystickOrderCallback()
+    *
+    */
     void changeState(int state){
         switch (state) {
             case 0:
@@ -632,7 +650,7 @@ private:
         }
     }
 
-    // Reset the state machine to the initial state
+    // Reset all the state machine parameters
     void reset(){
 
         RCLCPP_WARN(this->get_logger(),"!! RESET !!");
@@ -671,7 +689,9 @@ private:
     }
 
 
-
+    /* State machine of the car (see doc)
+    *  Decision control (transitions, states)
+    */
     void motionPlanning(){
 
         if (obstaclesReceived <= 0){
@@ -858,7 +878,7 @@ private:
         }
 
 
-        //States
+        // ------ States ------
         
         if (idle){
 
