@@ -671,6 +671,7 @@ private:
         hookDistance = 0.0;
         distanceTravelled = 0.0;
         distanceTravelledAvoidance = 0.0;
+        currentPoint = 0;
         autoFailed = false;
         orientationOK = false;
         orientationReceived = false;
