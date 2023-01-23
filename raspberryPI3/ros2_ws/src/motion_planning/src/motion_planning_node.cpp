@@ -223,8 +223,65 @@ private:
         else if (joyOrder.mode == 1)
             manualMode = false; //Autonomous Mode
 
-        // if (joyOrder.reset)
-        //     reset();
+        if (joyOrder.reset){
+            reset();
+            setInitialStates();
+        }
+            
+
+        if (mode !=4 && joyOrder.mode ==4){
+            mode = 4;
+            start = false;
+            moveState = 0;
+            reset();
+            RCLCPP_INFO(this->get_logger(), "---------- SELECT mode ----------");
+
+        }
+            
+
+        if (joyOrder.mode == 4){
+            start = false;
+
+            if (joyOrder.change_state){
+
+                moveState += 1;
+
+                if (moveState == 6)
+                    moveState = 1;
+
+                switch (moveState) {
+                    case 1:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'Analyse' ? ");
+                        break;
+                    case 2:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'No U-Turn' ? ");
+                        break;
+                    case 3:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'U-Turn' ? ");
+                        break;
+                    case 4:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'Reverse' ? ");
+                        break;
+                    case 5:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'Tow' ? ");
+                        break;
+                }
+
+                
+            }
+        }
+
+        if (mode == 4 && joyOrder.mode !=4){
+            mode = joyOrder.mode;
+            idle = true;
+            move = true;
+            changeState(moveState);
+
+            RCLCPP_INFO(this->get_logger(), "---------- SELECT mode [exit] ----------");
+            RCLCPP_INFO(this->get_logger(), "Press 'start' to restart");
+        }
+                
+
     }
 
     /* Update currentAngle from motors feedback [callback function]  :
@@ -541,10 +598,39 @@ private:
         printState = true;
     }
 
+    void changeState(int state){
+        switch (state) {
+            case 0:
+                setInitialStates();
+                RCLCPP_WARN(this->get_logger(), "Return to initial state");
+                break;    
+            case 1:
+                analyse = true;
+                RCLCPP_WARN(this->get_logger(), "'Analyse' selected");
+                break;
+            case 2:
+                noUturn = true;
+                RCLCPP_WARN(this->get_logger(), "'No U-Turn' selected");
+                break;
+            case 3:
+                uTurn = true;
+                RCLCPP_WARN(this->get_logger(), "'U-Turn' selected");
+                break;
+            case 4:
+                reverse = true;
+                RCLCPP_WARN(this->get_logger(), "'Reverse' selected");
+                break;
+            case 5:
+                RCLCPP_WARN(this->get_logger(), "'Tow' selected");
+                tow = true;
+                break;
+        }
+    }
+
     // Reset the state machine to the initial state
     void reset(){
 
-        RCLCPP_WARN(this->get_logger(),".... RESET ....");
+        RCLCPP_WARN(this->get_logger(),"!! RESET !!");
 
         analyse = false;
         noUturn = false;
@@ -577,7 +663,6 @@ private:
 
         start = false;
 
-        setInitialStates();
     }
 
 
@@ -631,6 +716,7 @@ private:
             autonomous = false;
             idle = true;
             reset();
+            setInitialStates();
 
             printState = true;
             RCLCPP_WARN(this->get_logger(), "TOWING END");
@@ -639,6 +725,7 @@ private:
             autonomous = false;
             idle = true;
             reset();
+            setInitialStates();
 
             printState = true;
             RCLCPP_ERROR(this->get_logger(), "AUTONOMOUS FAILED");
@@ -1047,12 +1134,14 @@ private:
     }
 
     // ---- Private variables ----
+    int mode; 
 
     bool hookDetected = false;
 
     //States
     bool analyse, noUturn, uTurn, reverse, tow, move, hooking, emergency, idle, manual, autonomous, avoidance = false;
     bool printState = true; // If true, the current state is displayed in the terminal
+    int moveState = 0;
 
     //Transitions
     bool start, manualMode, autoFailed, orientationOK, orientationReceived, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;

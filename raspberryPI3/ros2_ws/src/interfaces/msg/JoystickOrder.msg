@@ -9,3 +9,4 @@ bool reverse false
 
 #Autonomous
 bool reset false
+bool change_state false

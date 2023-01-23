@@ -82,6 +82,7 @@ private:
         buttonA = joy.buttons[buttonsMap.find("A")->second];  
         buttonY = joy.buttons[buttonsMap.find("Y")->second];
         buttonX = joy.buttons[buttonsMap.find("X")->second]; 
+        buttonLB = joy.buttons[buttonsMap.find("LB")->second];
         
 
         axisRT = joy.axes[axisMap.find("RT")->second];      //Motors (go forward)
@@ -97,6 +98,11 @@ private:
             buttonDpadLeft = true;
         else
             buttonDpadLeft = false;
+
+        if (joy.axes[axisMap.find("DPAD_X")->second] == -1.0)
+            buttonDpadRight = true;
+        else
+            buttonDpadRight = false;
         
         
 
@@ -152,6 +158,26 @@ private:
         }
 
 
+        if (buttonLB && !previousButtonLB){
+            previousMode = mode;
+            mode = 4;
+            start = false;
+        }
+
+        if (mode == 4){
+
+            if(buttonDpadRight && !previousButtonDpadRight)
+                changeState = true;
+
+            else 
+                changeState = false;
+        }
+
+        if (!buttonLB && previousButtonLB){
+            mode = previousMode;
+            start = false;
+        }
+
         // ------ Propulsion ------
         if (axisLT > DEADZONE_LT_RT && axisRT > DEADZONE_LT_RT){  //Incompatible orders : Stop the car
             requestedThrottle = STOP;
@@ -186,14 +212,22 @@ private:
         joystickOrderMsg.steer  = requestedAngle;
         joystickOrderMsg.reverse = reverse;
         joystickOrderMsg.reset = reset;
+        joystickOrderMsg.change_state = changeState;
 
         publisher_joystick_order_->publish(joystickOrderMsg); //Send order to the car_control_node
+
+        changeState = false;
+        previousButtonDpadRight = buttonDpadRight;
+        previousButtonLB = buttonLB;
     }
 
     //Joystick variables
     map<string,int> axisMap;
     map<string,int> buttonsMap;
-    bool buttonB, buttonStart, buttonA, buttonY, buttonX, buttonDpadBottom, buttonDpadLeft ;
+    bool buttonB, buttonStart, buttonA, buttonY, buttonX, buttonDpadBottom, buttonDpadLeft, buttonDpadRight, buttonLB ;
+
+    bool previousButtonDpadRight, previousButtonLB = false;
+    int previousMode = 0;
     
     float axisRT, axisLT, axisLS_X;
 
@@ -208,7 +242,7 @@ private:
     bool reverse;
 
     //Autonomous mode variable
-    bool reset;
+    bool reset, changeState;
 
 
 
