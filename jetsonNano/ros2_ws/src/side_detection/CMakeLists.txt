@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(interfaces)
+project(side_detection)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -8,31 +8,27 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
+find_package(interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
-set(msg_files
-  "msg/JoystickOrder.msg"
-  "msg/MotorsOrder.msg"
-  "msg/MotorsFeedback.msg"
-  "msg/GeneralData.msg"
-  "msg/SteeringCalibration.msg"
-  "msg/Ultrasonic.msg"
-  "msg/Gnss.msg"
-  "msg/SystemCheck.msg"
-  "msg/Hook.msg"
-  "msg/Obstacles.msg"
-  "msg/CmdSteer.msg"
-  "msg/CmdVel.msg"
-  "msg/ObstacleSide.msg"
+add_executable(side_detection_node 
+  src/side_detection_node.cpp
 )
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${msg_files}
-)
 
-ament_export_dependencies(rosidl_default_runtime)
+ament_target_dependencies(side_detection_node rclcpp interfaces sensor_msgs std_srvs nav_msgs)
+ament_export_include_directories(include)
+
+target_include_directories(side_detection_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(side_detection_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+
+install(TARGETS side_detection_node
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

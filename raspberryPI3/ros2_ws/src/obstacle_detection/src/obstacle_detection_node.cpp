@@ -6,6 +6,7 @@
 #include "interfaces/msg/obstacles.hpp"
 #include "interfaces/msg/fixed_obstacles.hpp"
 #include "interfaces/msg/motors_feedback.hpp"
+#include "interfaces/msg/obstacles_id.hpp"
 
 #include "../include/obstacle_detection/obstacle_detection_node.h"
 
@@ -48,11 +49,12 @@ class ObstacleDetection : public rclcpp::Node{
       //Publishers
       publisher_obstacle_= this->create_publisher<interfaces::msg::Obstacles>("obstacle", 10);
       publisher_fixed_obstacles_= this->create_publisher<interfaces::msg::FixedObstacles>("fixed_obstacles", 10);
+      publisher_obstacles_id_= this->create_publisher<interfaces::msg::ObstaclesID>("obstacles_id", 10);
 
       //Subscribers 
       subscription_us_data_ = this->create_subscription<interfaces::msg::Ultrasonic>("us_data", 10, std::bind(&ObstacleDetection::usDataCallback, this, _1));
       subscription_motor_data_ = this->create_subscription<interfaces::msg::MotorsFeedback>("motors_feedback", 10, std::bind(&ObstacleDetection::motorsDataCallback, this, _1));
-
+            
       //This timer calls the methode counterToFive() each 1s
       timerFixedObstacle = this->create_wall_timer(PERIOD_UPDATED_COUNTER_OBSTACLE, std::bind(&ObstacleDetection::counterToFive, this));
       
@@ -64,11 +66,13 @@ class ObstacleDetection : public rclcpp::Node{
     //Publishers
     rclcpp::Publisher<interfaces::msg::Obstacles>::SharedPtr publisher_obstacle_;
     rclcpp::Publisher<interfaces::msg::FixedObstacles>::SharedPtr publisher_fixed_obstacles_;
+    rclcpp::Publisher<interfaces::msg::ObstaclesID>::SharedPtr publisher_obstacles_id_;
     
     //Subscribers
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_us_data_;
     rclcpp::Subscription<interfaces::msg::MotorsFeedback>::SharedPtr subscription_motor_data_;
 
+    
     //Timers
     rclcpp::TimerBase::SharedPtr timerFixedObstacle;
 
@@ -111,7 +115,7 @@ class ObstacleDetection : public rclcpp::Node{
   
     void usDataCallback(const interfaces::msg::Ultrasonic & usMsg) {
 
-      // Message à publié
+      // Message à publier
       auto obstacleMsg = interfaces::msg::Obstacles();
 
       if (usMsg.front_left > OBSTACLE_PRESENT){
@@ -164,12 +168,13 @@ class ObstacleDetection : public rclcpp::Node{
 
       // Message publication
       publisher_obstacle_->publish(obstacleMsg);
+      obstaclesID();
     }
 
 
     void motorsDataCallback(const interfaces::msg::MotorsFeedback & motorMsg) {
 
-      // Message à publié
+      // Message à publier
       auto fixedObstacleMsg = interfaces::msg::FixedObstacles();
 
       r_motor = motorMsg.right_rear_speed ;
@@ -290,6 +295,47 @@ class ObstacleDetection : public rclcpp::Node{
           fixedObstacle_rr = false;
         }
     }
+    void obstaclesID(){
+      // Message à publier
+      auto obstacleIDMsg = interfaces::msg::ObstaclesID();
+
+      if (obstacle_fl && obstacle_fc && obstacle_fr){
+        obstacleIDMsg.obstacle_middle = true;
+        obstacleIDMsg.big_obstacle = true;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacle_right = false;
+
+      }else if (obstacle_fl && obstacle_fc){
+        obstacleIDMsg.obstacle_left = true;
+        obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_middle = false;
+        obstacleIDMsg.obstacle_right = false;
+      }else if (obstacle_fc && obstacle_fr){
+        obstacleIDMsg.obstacle_right = true;
+        obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacle_middle = false;
+      }else if (obstacle_fl){
+        obstacleIDMsg.obstacle_left = true;
+        obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_middle = false;
+        obstacleIDMsg.obstacle_right = false;
+      }else if (obstacle_fc){
+        obstacleIDMsg.obstacle_middle = true;
+        obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacle_right = false;
+      }else if (obstacle_fr){
+        obstacleIDMsg.obstacle_right = true;
+        obstacleIDMsg.big_obstacle = false;
+        obstacleIDMsg.obstacle_left = false;
+        obstacleIDMsg.obstacle_middle = false;
+      }
+
+      // Message publication
+      publisher_obstacles_id_->publish(obstacleIDMsg);
+    }
+
 };
 
 

@@ -5,7 +5,7 @@
 #include <string.h>  
 
 
-#define OBSTACLE_PRESENT 75 //Threshold distance which the object detected by the sensor is considered as obstacle
+#define OBSTACLE_PRESENT 100 //Threshold distance which the object detected by the sensor is considered as obstacle
 
 #define PERIOD_UPDATED_COUNTER_OBSTACLE 1s //Time for an fixed obstacle identification
 
