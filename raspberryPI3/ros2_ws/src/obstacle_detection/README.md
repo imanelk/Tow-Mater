@@ -2,7 +2,7 @@
 
 ## Overview
 
-*Obstacle Detection Node* is in charge of *detecting, identificating and locating* 
+**Obstacle Detection Node** is in charge of **detecting, identificating and locating** 
 an obstacle amoung the 6 defined zone.
 
 ## Nodes needed
@@ -43,7 +43,7 @@ and three on the back of the car.
 
 ## Run test
 
-To be able to run a test about the *detection* and *localisation of fixed obstacles* and , it must follow the next instructions:
+To be able to run a test about the **detection** and **localisation of fixed obstacles** and , it must follow the next instructions:
 
 1. In a Terminal run the Obstacle Detection Node with the command:
     >> ros2 run obstacle_detection obstacle_detection_node
