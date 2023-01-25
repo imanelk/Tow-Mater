@@ -46,20 +46,27 @@ and three on the back of the car.
 To be able to run a test about the **detection** and **localisation of fixed obstacles** and , it must follow the next instructions:
 
 1. In a Terminal run the Obstacle Detection Node with the command:
-    >> ros2 run obstacle_detection obstacle_detection_node
-
+   ```
+   ros2 run obstacle_detection obstacle_detection_node
+   ```
 2. In a second Terminal publish on /motors_feedback topic with the command below 
-  with a speed equals to zero:
-    >> ros2 topic pub motors_feedback interfaces/msg/MotorsFeedback “l<TAB>”
-
+   with a speed equals to zero:
+   ```
+   ros2 topic pub motors_feedback interfaces/msg/MotorsFeedback “l<TAB>”
+   ```
 3. In a third Terminal publish on /us_data topic with the command below with 
-  a distance less than the threshold distance:
-    >> ros2 topic pub us_data interface/msg/Ultrasonic “f<TAB>”
-
+   a distance less than the threshold distance:
+   ```
+   ros2 topic pub us_data interface/msg/Ultrasonic “f<TAB>”
+   ```
 4. In a forth Terminal display the values published on /fixed_obstacles topic with
-  the command below:
-    >> ros2 echo /fixed_obstacles
+   the command below:
+   ```
+   ros2 echo /fixed_obstacles
+   ```
 
 5. In a fifth Terminal: display the values publish on /obstacles_id topic with 
-  the command below:
-    >> ros2 echo /obstacles_id
+   the command below:
+   ```
+   ros2 echo /obstacles_id
+   ```
