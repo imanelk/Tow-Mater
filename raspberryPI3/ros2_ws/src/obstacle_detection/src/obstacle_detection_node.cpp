@@ -63,6 +63,7 @@ class ObstacleDetection : public rclcpp::Node{
   
   private: 
   // ---- Private variables ----
+
     //Publishers
     rclcpp::Publisher<interfaces::msg::Obstacles>::SharedPtr publisher_obstacle_;
     rclcpp::Publisher<interfaces::msg::FixedObstacles>::SharedPtr publisher_fixed_obstacles_;
@@ -76,10 +77,10 @@ class ObstacleDetection : public rclcpp::Node{
     //Timers
     rclcpp::TimerBase::SharedPtr timerFixedObstacle;
 
-    //area array contains 6 zones represented by each ultrasonic sensors
+    // area array contains 6 zones represented by each ultrasonic sensors
     int16_t area[6];
 
-    //Obstacle_ represents if there is an obstacle in any of 6 zones 
+    //obstacle_x represents if there is an obstacle in any of 6 zones 
     bool obstacle_fl;
     bool obstacle_fc;
     bool obstacle_fr;
@@ -115,7 +116,7 @@ class ObstacleDetection : public rclcpp::Node{
   
     void usDataCallback(const interfaces::msg::Ultrasonic & usMsg) {
 
-      // Message à publier
+      // Message to publish
       auto obstacleMsg = interfaces::msg::Obstacles();
 
       if (usMsg.front_left > OBSTACLE_PRESENT){
@@ -174,7 +175,7 @@ class ObstacleDetection : public rclcpp::Node{
 
     void motorsDataCallback(const interfaces::msg::MotorsFeedback & motorMsg) {
 
-      // Message à publier
+      // Message to publish
       auto fixedObstacleMsg = interfaces::msg::FixedObstacles();
 
       r_motor = motorMsg.right_rear_speed ;
@@ -296,7 +297,7 @@ class ObstacleDetection : public rclcpp::Node{
         }
     }
     void obstaclesID(){
-      // Message à publier
+      // Message to publish
       auto obstacleIDMsg = interfaces::msg::ObstaclesID();
 
       if (obstacle_fl && obstacle_fc && obstacle_fr){
