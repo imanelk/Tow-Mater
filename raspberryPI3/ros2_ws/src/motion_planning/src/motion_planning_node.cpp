@@ -12,6 +12,8 @@
 #include "interfaces/msg/joystick_order.hpp"
 #include "interfaces/msg/motors_feedback.hpp"
 #include "interfaces/msg/ultrasonic.hpp"
+#include "interfaces/msg/avoidance_parameters.hpp"
+#include "interfaces/msg/orientation.hpp"
 
 using namespace std;
 using placeholders::_1;
@@ -30,11 +32,11 @@ public:
 
         nutTraj[0].velocity = 0.8;
         nutTraj[0].angle = 1.0;
-        nutTraj[0].distance = 150.0;
+        nutTraj[0].distance = 161.0;
 
         nutTraj[1].velocity = 0.8;
         nutTraj[1].angle = -1.0;
-        nutTraj[1].distance = 175.0;
+        nutTraj[1].distance = 139.0;
 
         nutTraj[2].velocity = 0.0;
         nutTraj[2].angle = 0.0;
@@ -44,41 +46,112 @@ public:
 
         utTraj[0].velocity = -0.8;
         utTraj[0].angle = -1.0;
-        utTraj[0].distance = 320.0;
+        utTraj[0].distance = 332.0;
 
         utTraj[1].velocity = 0.8;
         utTraj[1].angle = 1.0;
-        utTraj[1].distance = 191.0;
+        utTraj[1].distance = 187.0;
 
         utTraj[2].velocity = -0.8;
         utTraj[2].angle = -1.0;
-        utTraj[2].distance = 164.0;
+        utTraj[2].distance = 161.0;
 
         utTraj[3].velocity = 0.0;
         utTraj[3].angle = 0.0;
         utTraj[3].distance = 0.0;
 
-        //Avoidance
+        // --- Avoidance Trajectories---
 
-        avoidanceTraj[0].velocity = 0.8;
-        avoidanceTraj[0].angle = -1.0;
-        avoidanceTraj[0].distance = 70.0;
+        //Short Left
 
-        avoidanceTraj[1].velocity = 0.8;
-        avoidanceTraj[1].angle = 0.0;
-        avoidanceTraj[1].distance = 72.0;
+        shortLeftTraj[0].velocity = 0.8;
+        shortLeftTraj[0].angle = -1.0;
+        shortLeftTraj[0].distance = 70.0;
 
-        avoidanceTraj[2].velocity = 0.8;
-        avoidanceTraj[2].angle = +1.0;
-        avoidanceTraj[2].distance = 205.0;
+        shortLeftTraj[1].velocity = 0.8;
+        shortLeftTraj[1].angle = 0.0;
+        shortLeftTraj[1].distance = 72.0;
 
-        avoidanceTraj[3].velocity = 0.8;
-        avoidanceTraj[3].angle = -1.0;
-        avoidanceTraj[3].distance = 100.0;
+        shortLeftTraj[2].velocity = 0.8;
+        shortLeftTraj[2].angle = +1.0;
+        shortLeftTraj[2].distance = 205.0;
 
-        avoidanceTraj[4].velocity = 0.0;
-        avoidanceTraj[4].angle = 0.0;
-        avoidanceTraj[4].distance = 0.0;
+        shortLeftTraj[3].velocity = 0.8;
+        shortLeftTraj[3].angle = -1.0;
+        shortLeftTraj[3].distance = 100.0;
+
+        shortLeftTraj[4].velocity = 0.0;
+        shortLeftTraj[4].angle = 0.0;
+        shortLeftTraj[4].distance = 0.0;
+
+        //Short Right
+
+        shortRightTraj[0].velocity = 0.8;
+        shortRightTraj[0].angle = 1.0;
+        shortRightTraj[0].distance = 76.0;
+
+        shortRightTraj[1].velocity = 0.8;
+        shortRightTraj[1].angle = 0.0;
+        shortRightTraj[1].distance = 58.0;
+
+        shortRightTraj[2].velocity = 0.8;
+        shortRightTraj[2].angle = -1.0;
+        shortRightTraj[2].distance = 163.0;
+
+        shortRightTraj[3].velocity = 0.8;
+        shortRightTraj[3].angle = 1.0;
+        shortRightTraj[3].distance = 105.0;
+
+        shortRightTraj[4].velocity = 0.0;
+        shortRightTraj[4].angle = 0.0;
+        shortRightTraj[4].distance = 0.0;
+
+
+        // Large Left
+
+        largeLeftTraj[0].velocity = -0.8;
+        largeLeftTraj[0].angle = 1.0;
+        largeLeftTraj[0].distance = 40.0;
+
+        largeLeftTraj[1].velocity = 0.8;
+        largeLeftTraj[1].angle = -1.0;
+        largeLeftTraj[1].distance = 92.0;
+
+        largeLeftTraj[2].velocity = 0.8;
+        largeLeftTraj[2].angle = +1.0;
+        largeLeftTraj[2].distance = 273.0;
+
+        largeLeftTraj[3].velocity = 0.8;
+        largeLeftTraj[3].angle = -1.0;
+        largeLeftTraj[3].distance = 111.0;
+
+        largeLeftTraj[4].velocity = 0.0;
+        largeLeftTraj[4].angle = 0.0;
+        largeLeftTraj[4].distance = 0.0;
+
+        // Large Right
+
+        largeRightTraj[0].velocity = -0.8;
+        largeRightTraj[0].angle = -1.0;
+        largeRightTraj[0].distance = 40.0;
+
+        largeRightTraj[1].velocity = 0.8;
+        largeRightTraj[1].angle = 1.0;
+        largeRightTraj[1].distance = 89.0;
+
+        largeRightTraj[2].velocity = 0.8;
+        largeRightTraj[2].angle = -1.0;
+        largeRightTraj[2].distance = 216.0;
+
+        largeRightTraj[3].velocity = 0.8;
+        largeRightTraj[3].angle = 1.0;
+        largeRightTraj[3].distance = 111.0;
+
+        largeRightTraj[4].velocity = 0.0;
+        largeRightTraj[4].angle = 0.0;
+        largeRightTraj[4].distance = 0.0;
+
+        setAvoidanceTraj(shortLeftTraj);
 
 
         publisher_cmd_vel_= this->create_publisher<interfaces::msg::CmdVel>("consign_speed", 10);
@@ -101,11 +174,17 @@ public:
         subscription_fixed_obstacles_ = this->create_subscription<interfaces::msg::FixedObstacles>(
         "fixed_obstacles", 10, std::bind(&motion_planning::fixedObstaclesCallback, this, _1));
 
+        subscription_avoidance_parameters_ = this->create_subscription<interfaces::msg::AvoidanceParameters>(
+        "avoidance_parameters", 10, std::bind(&motion_planning::avoidanceParametersCallback, this, _1));
+
         subscription_distance_ = this->create_subscription<interfaces::msg::Distance>(
         "distance", 10, std::bind(&motion_planning::distanceCallback, this, _1));
 
         subscription_ultrasonic_ = this->create_subscription<interfaces::msg::Ultrasonic>(
         "us_data", 10, std::bind(&motion_planning::ultrasonicCallback, this, _1));
+
+        subscription_orientation_ = this->create_subscription<interfaces::msg::Orientation>(
+        "orientation", 10, std::bind(&motion_planning::orientationCallback, this, _1));
 
         timer_motion_planning_ = this->create_wall_timer(PERIOD_UPDATE_MOTION, std::bind(&motion_planning::motionPlanning, this));
  
@@ -117,13 +196,18 @@ public:
 
         setInitialStates();
         safeMode = true;
-        setSecurityDistance(NS_DISTANCE);
+        setSecurityDistance(NS_DISTANCE,NS_DISTANCE);
 
     }
 
     
 private:
 
+    struct VAD_POINT {
+        float velocity;
+        float angle;
+        float distance;
+    };
 
     /* Update start and mode from joystick order [callback function]  :
     *
@@ -138,9 +222,69 @@ private:
             manualMode = true;  //Manual Mode
         else if (joyOrder.mode == 1)
             manualMode = false; //Autonomous Mode
+
+        if (joyOrder.reset){
+            reset();
+            setInitialStates();
+        }
+            
+
+        if (mode !=4 && joyOrder.mode ==4){
+            mode = 4;
+            start = false;
+            moveState = 0;
+            reset();
+            RCLCPP_INFO(this->get_logger(), "---------- SELECT mode ----------");
+
+        }
+            
+
+        if (joyOrder.mode == 4){
+            start = false;
+
+            if (joyOrder.change_state){
+
+                moveState += 1;
+
+                if (moveState == 6)
+                    moveState = 1;
+
+                switch (moveState) {
+                    case 1:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'Analyse' ? ");
+                        break;
+                    case 2:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'No U-Turn' ? ");
+                        break;
+                    case 3:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'U-Turn' ? ");
+                        break;
+                    case 4:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'Reverse' ? ");
+                        break;
+                    case 5:
+                        RCLCPP_INFO(this->get_logger(), "Switch to 'Tow' ? ");
+                        break;
+                }
+
+                
+            }
+        }
+
+        if (mode == 4 && joyOrder.mode !=4){
+            mode = joyOrder.mode;
+            idle = true;
+            move = true;
+            changeState(moveState);
+
+            RCLCPP_INFO(this->get_logger(), "---------- SELECT mode [exit] ----------");
+            RCLCPP_INFO(this->get_logger(), "Press 'start' to restart");
+        }
+                
+
     }
 
-    /* Update currentAngle from motors feedback [callback function]  :
+    /* Update feedbackSteer from motors feedback [callback function]  :
     *
     * This function is called when a message is published on the "/motors_feedback" topic
     * 
@@ -149,11 +293,22 @@ private:
         feedbackSteer = motorsFeedback.steering_angle;
     }
 
+    /* Update orientationOK and orientationReceived [callback function]  :
+    *
+    * This function is called when a message is published on the "/orientation" topic
+    * The two cars are in the same orientation => orientationOK = true => no U-turn
+    * The two cars are not in the same orientation => orientationOK = false => U-turn
+    */
+    void orientationCallback(const interfaces::msg::Orientation & orientationMsg){
+        orientationOK = orientationMsg.same_orientation;
+        orientationReceived = true;
+    }
+
 
     /* Update usRearLeft and usRearRight from ultrasonic feedback [callback function]  :
     *
     * This function is called when a message is published on the "/ultrasonic" topic
-    * 
+    * usRearLeft and usRearRight are used to correct the final reverse trajectory
     */
     void ultrasonicCallback(const interfaces::msg::Ultrasonic & usonic){
         usRearLeft = usonic.rear_left ;
@@ -173,15 +328,15 @@ private:
             if (!hookDetected){
                 RCLCPP_INFO(this->get_logger(), "Hook detected");
                 hookDetected = true;
-                setSecurityDistance(LLS_DISTANCE);
+                setSecurityDistance(NS_DISTANCE,LLS_DISTANCE);
             }
             hookPos_x = hookMsg.x;
 
 
-            hookDistance = 40.0;
+            hookDistance = 40.0;    //TO-DO : Get the real value
 
         } else if (hookMsg.type == "fdc")
-            hookFdc = hookMsg.status;
+            hookFdc = hookMsg.status;   //End of course sensor
         
     }
 
@@ -196,14 +351,6 @@ private:
         distanceTravelled += distanceMsg.total - lastDistance;
         distanceTravelledAvoidance += distanceMsg.total - lastDistance;
         lastDistance = distanceMsg.total;
-
-        //RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-
-        // printDistance = distanceTravelled;
-        // if (printDistance >= 20.0){
-        //     printDistance = 0.0;
-        //     RCLCPP_INFO(this->get_logger(), "Distance : %f cm",distanceTravelled);
-        // }
 
     }
 
@@ -249,11 +396,33 @@ private:
         
     }
 
-
+    /* Update frontFixedObstacle from fixed_obstacles feedback [callback function]  :
+    *
+    * This function is called when a message is published on the "/front_obstacles" topic
+    * 
+    */
     void fixedObstaclesCallback(const interfaces::msg::FixedObstacles & fixedObstacleMsg){
 
         if (fixedObstacleMsg.fixed_obstacles[0] || fixedObstacleMsg.fixed_obstacles[1] || fixedObstacleMsg.fixed_obstacles[2] )
             frontFixedObstacle = true;
+    }
+
+    /* Update avoidanceChoice from avoidance feedback [callback function]  :
+    *
+    * This function is called when a message is published on the "/avoidance_parameters" topic
+    * 
+    */
+    void avoidanceParametersCallback(const interfaces::msg::AvoidanceParameters & avoidanceParamMsg){
+
+        if (avoidanceParamMsg.big && avoidanceParamMsg.left)
+            avoidanceChoice = "large left";
+        else if (avoidanceParamMsg.big && !avoidanceParamMsg.left)
+            avoidanceChoice = "large right";
+        else if (!avoidanceParamMsg.big && avoidanceParamMsg.left)
+            avoidanceChoice = "short left";
+        else if (!avoidanceParamMsg.big && !avoidanceParamMsg.left)
+            avoidanceChoice = "short right";
+
     }
 
     /* Compute the steering angle for the final reverse  :
@@ -291,18 +460,18 @@ private:
 
         else{
 
-            if (currentVelocity > 0 && (frontObstacleDistance >=0) && (frontObstacleDistance <= securityDistance)){
+            if (currentVelocity > 0 && (frontObstacleDistance >=0) && (frontObstacleDistance <= frontSecurityDistance)){
                 obstacleDetected = true;
 
-            } else if (currentVelocity < 0 && (rearObstacleDistance >=0) && (rearObstacleDistance <= securityDistance)){
+            } else if (currentVelocity < 0 && (rearObstacleDistance >=0) && (rearObstacleDistance <= backSecurityDistance)){
                 obstacleDetected = true;
             }
             
 
-            if(targetVelocity > 0 && ((frontObstacleDistance == -1) || (frontObstacleDistance > securityDistance))){
+            if(targetVelocity > 0 && ((frontObstacleDistance == -1) || (frontObstacleDistance > frontSecurityDistance))){
                 obstacleDetected = false;
 
-            }else if (targetVelocity < 0 && ((rearObstacleDistance == -1) || (rearObstacleDistance > securityDistance))){
+            }else if (targetVelocity < 0 && ((rearObstacleDistance == -1) || (rearObstacleDistance > backSecurityDistance))){
                 obstacleDetected = false;
             }
 
@@ -346,6 +515,7 @@ private:
 
     /* Publish the steering angle on the /consign_steer topic
     * If the angle is the same as the current one : the angle is not published
+    * If steerStop = true, the steering motor is stopped
     */
     void sendSteer(float angle, bool steerStop){
 
@@ -376,7 +546,7 @@ private:
     }
     
 
-    /* Publish the hook locking order on the /hook topic
+    /* Publish the hook unlocking order on the /hook topic
     *
     */
     void unlockHook(){
@@ -394,7 +564,7 @@ private:
     }
 
 
-    /* Publish the hook unlocking order on the /hook topic
+    /* Publish the hook locking order on the /hook topic
     *
     */
     void lockHook(){
@@ -411,11 +581,30 @@ private:
         
     }
 
-    void setSecurityDistance(int distance){
+    /* Change the securityDistance
+    *
+    */
+    void setSecurityDistance(int frontDistance, int backDistance){
 
-        if (distance != securityDistance){
-            securityDistance = distance;
-            RCLCPP_INFO(this->get_logger(), "Security Distance : %d cm", securityDistance);
+        if (frontDistance != frontSecurityDistance){
+            frontSecurityDistance = frontDistance;
+            RCLCPP_INFO(this->get_logger(), "Front Security Distance : %d cm", frontSecurityDistance);
+        }
+
+        if (backDistance != backSecurityDistance){
+            backSecurityDistance = backDistance;
+            RCLCPP_INFO(this->get_logger(), "Back Security Distance : %d cm", backSecurityDistance);
+        }
+
+    }
+
+    /* Set the avoidance trajectory
+    *
+    */
+    void setAvoidanceTraj (struct VAD_POINT * traj){
+
+        for (int i = 0; i < NB_AVOIDANCE_POINTS ;i++){
+            avoidanceTraj[i] = traj[i] ;
         }
 
     }
@@ -429,8 +618,43 @@ private:
         printState = true;
     }
 
-    // Reset the state machine to the initial state
+    /* Change the current state, called when mode = 4 (SELECT mode). See joystickOrderCallback()
+    *
+    */
+    void changeState(int state){
+        switch (state) {
+            case 0:
+                setInitialStates();
+                RCLCPP_WARN(this->get_logger(), "Return to initial state");
+                break;    
+            case 1:
+                analyse = true;
+                RCLCPP_WARN(this->get_logger(), "'Analyse' selected");
+                break;
+            case 2:
+                noUturn = true;
+                RCLCPP_WARN(this->get_logger(), "'No U-Turn' selected");
+                break;
+            case 3:
+                uTurn = true;
+                RCLCPP_WARN(this->get_logger(), "'U-Turn' selected");
+                break;
+            case 4:
+                reverse = true;
+                RCLCPP_WARN(this->get_logger(), "'Reverse' selected");
+                break;
+            case 5:
+                RCLCPP_WARN(this->get_logger(), "'Tow' selected");
+                tow = true;
+                break;
+        }
+    }
+
+    // Reset all the state machine parameters
     void reset(){
+
+        RCLCPP_WARN(this->get_logger(),"!! RESET !!");
+
         analyse = false;
         noUturn = false;
         uTurn = false;
@@ -447,12 +671,13 @@ private:
         hookDistance = 0.0;
         distanceTravelled = 0.0;
         distanceTravelledAvoidance = 0.0;
+        currentPoint = 0;
         autoFailed = false;
         orientationOK = false;
-        trajectoryOK = false;
+        orientationReceived = false;
         alignmentEnd = false;
         hookFdc = false;
-        hookLocked = false;
+        hookLocked = true;
         hookEnd = false;
         obstacleDetected = false;
         frontFixedObstacle = false;
@@ -460,11 +685,14 @@ private:
 
         safeMode = true;
 
-        setInitialStates();
+        start = false;
+
     }
 
 
-
+    /* State machine of the car (see doc)
+    *  Decision control (transitions, states)
+    */
     void motionPlanning(){
 
         if (obstaclesReceived <= 0){
@@ -514,6 +742,7 @@ private:
             autonomous = false;
             idle = true;
             reset();
+            setInitialStates();
 
             printState = true;
             RCLCPP_WARN(this->get_logger(), "TOWING END");
@@ -522,6 +751,7 @@ private:
             autonomous = false;
             idle = true;
             reset();
+            setInitialStates();
 
             printState = true;
             RCLCPP_ERROR(this->get_logger(), "AUTONOMOUS FAILED");
@@ -564,6 +794,23 @@ private:
             emergency = false;
             avoidance = true;
 
+            if (avoidanceChoice == "large left"){
+                RCLCPP_INFO(this->get_logger(), "Large Left avoidance");
+                setAvoidanceTraj(largeLeftTraj);
+
+            }else if (avoidanceChoice == "short left"){
+                RCLCPP_INFO(this->get_logger(), "Short Left avoidance");
+                setAvoidanceTraj(shortLeftTraj);
+
+            }else if (avoidanceChoice == "large right"){
+                RCLCPP_INFO(this->get_logger(), "Large Right avoidance");
+                setAvoidanceTraj(largeRightTraj);
+
+            }else if (avoidanceChoice == "short right"){
+                RCLCPP_INFO(this->get_logger(), "Short Right avoidance");
+                setAvoidanceTraj(shortRightTraj);
+            }
+
             distanceTravelledAvoidance = 0.0;
             printState = true;
         }
@@ -576,7 +823,7 @@ private:
 
             printState = true;
 
-        } else if (avoidance && safeMode && obstacleDetected && (securityDistance == LLS_DISTANCE)){
+        } else if (avoidance && safeMode && obstacleDetected && (frontSecurityDistance == AVOIDANCE_DISTANCE)){
             avoidance = false;
             emergency = true;
 
@@ -597,13 +844,13 @@ private:
             printState = true;
         }
 
-        if (analyse && trajectoryOK && !orientationOK){
+        if (analyse && !orientationOK && orientationReceived){
             analyse = false;
             uTurn = true;
 
             printState = true;
 
-        } else if (analyse && trajectoryOK && orientationOK){
+        } else if (analyse && orientationOK && orientationReceived){
             analyse = false;
             noUturn = true;
 
@@ -632,7 +879,7 @@ private:
         }
 
 
-        //States
+        // ------ States ------
         
         if (idle){
 
@@ -666,14 +913,13 @@ private:
 
             } else if (avoidance){
 
-                //frontFixedObstacle = false;
                 avoidanceInProgress = true;
 
                 if (printState)
                     RCLCPP_WARN(this->get_logger(), "-> AVOIDANCE");
             
                 safeMode = true;
-                setSecurityDistance(LLS_DISTANCE);
+                setSecurityDistance(AVOIDANCE_DISTANCE,LLS_DISTANCE);
 
                 if (distanceTravelledAvoidance >= avoidanceTraj[currentPoint].distance){
 
@@ -730,38 +976,60 @@ private:
 
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> ANALYSE");
-                    // ...
+                    
 
                 }else if (noUturn){
 
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> NO U-TURN");
-
-                    if (currentPoint == 0){
-                        sendSteer(nutTraj[currentPoint].angle, false);
-                        targetVelocity = nutTraj[currentPoint].velocity;
-                        sendVel(targetVelocity);
-                        
-                    }
+                
+                    safeMode = true;
+                    setSecurityDistance(NS_DISTANCE,NS_DISTANCE);
 
                     if (distanceTravelled >= nutTraj[currentPoint].distance){
 
-                        if (currentPoint == (NB_UT_POINTS - 1)){    //Last point
-                            distanceTravelled = 0;
-                            currentPoint = 0;
-                            alignmentEnd = true;
-                            return ;
+                        if (currentPoint == (NB_NUT_POINTS - 1)){    //Last point
+
+                            targetSteer = nutTraj[currentPoint].angle;
+                            sendSteer(targetSteer, false);   //Turn steering
+
+                            if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                                targetVelocity = 0.0;   //Stop until targetSteer is reached
+                                sendVel(targetVelocity);
+
+                            } else{
+                                distanceTravelled = 0;
+                                currentPoint = 0;
+                                alignmentEnd = true;
+                                safeMode = true;
+                                return ;
+                            }
+
+                            
                         }
                         else{
                             distanceTravelled = 0;
 
-                            currentPoint++; 
-
-                            sendSteer(utTraj[currentPoint].angle, false);
-                            targetVelocity = utTraj[currentPoint].velocity;
+                            targetVelocity = 0.0; //Stop
                             sendVel(targetVelocity);
+
+                            currentPoint++; 
+                            
                         }
                     }
+
+                    targetSteer = nutTraj[currentPoint].angle;
+                    sendSteer(targetSteer, false);   //Turn steering
+
+                    if (!inTolerance(targetSteer, feedbackSteer, TOLERANCE_STEER)){
+                        targetVelocity = 0.0;   //Stop until targetSteer is reached
+                        sendVel(targetVelocity);
+                    
+                    } else{
+                        targetVelocity = nutTraj[currentPoint].velocity; 
+                        sendVel(targetVelocity);    //Send velocity
+                    }
+
 
                 }else if (uTurn){
 
@@ -771,7 +1039,7 @@ private:
                         RCLCPP_WARN(this->get_logger(), "--> U-TURN");
                 
                     safeMode = true;
-                    setSecurityDistance(NS_DISTANCE);
+                    setSecurityDistance(NS_DISTANCE,NS_DISTANCE);
 
                     if (distanceTravelled >= utTraj[currentPoint].distance){
 
@@ -829,7 +1097,7 @@ private:
 
                     }else if (hookDistance <= 50.0){
 
-                        setSecurityDistance(LLS_DISTANCE);
+                        setSecurityDistance(NS_DISTANCE,LLS_DISTANCE);
 
                         targetSteer = computeTargetAngle(usRearLeft,usRearRight);
 
@@ -855,7 +1123,7 @@ private:
                     if (printState)
                         RCLCPP_WARN(this->get_logger(), "--> TOW");
 
-                    setSecurityDistance(NS_DISTANCE);
+                    setSecurityDistance(TOW_DISTANCE,LLS_DISTANCE);
 
                     if (distanceTravelled < TOWING_DISTANCE){
                         targetVelocity = TOWING_VELOCITY;
@@ -880,7 +1148,7 @@ private:
                 sendSteer(0.0,false);
                 sleep(1.0);
                 lockHook();
-                setSecurityDistance(NS_DISTANCE);
+                setSecurityDistance(NS_DISTANCE,LLS_DISTANCE);
                 hookEnd = true;
 
             }
@@ -892,15 +1160,17 @@ private:
     }
 
     // ---- Private variables ----
+    int mode; 
 
     bool hookDetected = false;
 
     //States
     bool analyse, noUturn, uTurn, reverse, tow, move, hooking, emergency, idle, manual, autonomous, avoidance = false;
     bool printState = true; // If true, the current state is displayed in the terminal
+    int moveState = 0;
 
     //Transitions
-    bool start, manualMode, autoFailed, orientationOK, trajectoryOK, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;
+    bool start, manualMode, autoFailed, orientationOK, orientationReceived, alignmentEnd, hookFdc, hookEnd, obstacleDetected, safeMode, towingEnd, avoidanceEnd, avoidanceInProgress = false;
     bool hookLocked = true;
     //Trajectories
     float currentVelocity = 0.0;
@@ -910,17 +1180,20 @@ private:
     float feedbackSteer = 0.0;
     float hookPos_x = -1.0;
 
-    struct VAD_POINT {
-        float velocity;
-        float angle;
-        float distance;
-    };
-
     int currentPoint = 0;
 
     VAD_POINT nutTraj[NB_NUT_POINTS];
     VAD_POINT utTraj[NB_UT_POINTS];
+
+
+    VAD_POINT shortLeftTraj[NB_AVOIDANCE_POINTS];
+    VAD_POINT largeLeftTraj[NB_AVOIDANCE_POINTS];
+    VAD_POINT shortRightTraj[NB_AVOIDANCE_POINTS];
+    VAD_POINT largeRightTraj[NB_AVOIDANCE_POINTS];
+
     VAD_POINT avoidanceTraj[NB_AVOIDANCE_POINTS];
+
+    string avoidanceChoice = "short left";
 
     // Ultrasonic sensors
     int usRearLeft ;
@@ -928,7 +1201,8 @@ private:
 
 
     //Security
-    int securityDistance = 0;
+    int frontSecurityDistance = 0;
+    int backSecurityDistance = 0;
     int obstaclesReceived = 0;  //0 and -1 => not received ; 1 => received
     int frontObstacleDistance, rearObstacleDistance = 0;   //minimum obstacle distance (-1 if no obstacle)
     bool frontFixedObstacle = false;
@@ -953,8 +1227,10 @@ private:
     rclcpp::Subscription<interfaces::msg::Hook>::SharedPtr subscription_hook_;
     rclcpp::Subscription<interfaces::msg::Obstacles>::SharedPtr subscription_obstacles_;
     rclcpp::Subscription<interfaces::msg::FixedObstacles>::SharedPtr subscription_fixed_obstacles_;
+    rclcpp::Subscription<interfaces::msg::AvoidanceParameters>::SharedPtr subscription_avoidance_parameters_;
     rclcpp::Subscription<interfaces::msg::Distance>::SharedPtr subscription_distance_;
     rclcpp::Subscription<interfaces::msg::Ultrasonic>::SharedPtr subscription_ultrasonic_;
+    rclcpp::Subscription<interfaces::msg::Orientation>::SharedPtr subscription_orientation_;
 
     //Timers
     rclcpp::TimerBase::SharedPtr timer_motion_planning_;
