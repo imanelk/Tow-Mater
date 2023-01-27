@@ -67,4 +67,4 @@ When the system is started, you can use the joystick :
 
 In autonomous mode, you can choose a particular maneuver (No U-turn, u-turn, reverse ...). To do this, you must hold down the LB button and select the maneuver with DPAD-RIGHT. Release LB to confirm the choice.
 
-You must place the two vehicles parallel to each other, with a space of 50 cm between them. The towing vehicle must be on the left side of the towed vehicle (See video)
+You must place the two vehicles parallel to each other, with a space of 50 cm between them. The towing vehicle must be on the left side of the towed vehicle (see [Video](https://youtu.be/MB7T-dSHWLg)). 
