@@ -21,7 +21,7 @@
 #define TOWING_VELOCITY 1.0 // [m/s] 
 #define TOWING_DISTANCE 4000 // [cm]
 
-#define MIN_DISTANCE_AVOIDANCE 65 // minimum distance from the obstacle to start the avoidance process
+#define MIN_DISTANCE_AVOIDANCE 30 // minimum distance from the obstacle to start the avoidance process
 
 // ---- Trajectories
 
@@ -39,12 +39,14 @@
 // Security
 #define NS_DISTANCE 75 //NormalSecurity Distance [cm]
 #define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
+#define AVOIDANCE_DISTANCE 25 //Avoidance Distance [cm]
+#define TOW_DISTANCE 100 //Towing Security Distance [cm]
 
 
 // State machine
 #define INITIAL_STATE_MACHINE idle
 #define INITIAL_AUTONOMOUS move
-#define INITIAL_MOVE tow
+#define INITIAL_MOVE analyse
  
 
 #endif /*__motion_planning_node_HPP */

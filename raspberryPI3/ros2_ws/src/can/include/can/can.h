@@ -1,7 +1,8 @@
 #ifndef __can_H
 #define __can_H
 
-#define ID_MOTORS_DATAS 0x200   //Odometry + Motors feedback
+#define ID_MOTORS_DATAS 0x200   //Motors feedback
+#define ID_ODOMETRY 0x201       //Odometry
 #define ID_US1 0x211            //Front US
 #define ID_US2 0x221            //Rear US
 #define ID_IMU1 0x232           //Magnetic

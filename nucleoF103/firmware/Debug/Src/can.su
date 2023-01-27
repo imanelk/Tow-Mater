@@ -1,8 +1,0 @@
-../Src/can.c:62:6:MX_CAN_Init	8	static
-../Src/can.c:86:6:HAL_CAN_MspInit	40	static
-../Src/can.c:122:6:HAL_CAN_MspDeInit	16	static
-../Src/can.c:150:6:CAN_FilterConfig	48	static
-../Src/can.c:173:6:CAN_Send	24	static
-../Src/can.c:191:5:read_cmd	24	static
-../Src/can.c:204:5:read_mode	24	static
-../Src/can.c:212:6:HAL_CAN_RxCpltCallback	16	static
