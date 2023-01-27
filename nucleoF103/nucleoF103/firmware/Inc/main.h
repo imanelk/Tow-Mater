@@ -83,6 +83,7 @@
 
 	//CAN
 #define PERIOD_SEND_MOTORS 10 // Period in ms to send motors data
+#define PERIOD_SEND_ODOMETRY 200 // Period in ms to send motors data
 #define PERIOD_SEND_BATT 2000 // Period in ms to send battery level
 /* USER CODE END Private defines */
 

@@ -47,6 +47,7 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern int CAN_SEND_MOTORS;
+extern int CAN_SEND_ODOMETRY;
 extern int US_FLAG;
 extern int CAN_SEND_BATT;
 
@@ -87,6 +88,7 @@ void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 	static int cmpt_can_motors = 0;
+	static int cmpt_can_odometry = 0;
 	static int cmpt_us = 0;
 	static int cmpt_batt = 0;
   /* USER CODE END SysTick_IRQn 0 */
@@ -95,12 +97,17 @@ void SysTick_Handler(void)
   HAL_SYSTICK_IRQHandler();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 	cmpt_can_motors ++;
+	cmpt_can_odometry++;
 	cmpt_us++;
 	cmpt_batt++;
 	
 	if (cmpt_can_motors == PERIOD_SEND_MOTORS){
 		CAN_SEND_MOTORS = 1;
 		cmpt_can_motors = 0;
+	}
+	if (cmpt_can_odometry == PERIOD_SEND_ODOMETRY){
+		CAN_SEND_ODOMETRY = 1;
+		cmpt_can_odometry = 0;
 	}
 	if (cmpt_us == PERIOD_UPDATE_US){
 		US_FLAG = 1;

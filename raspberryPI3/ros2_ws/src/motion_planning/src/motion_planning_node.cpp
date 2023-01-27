@@ -351,7 +351,6 @@ private:
         distanceTravelled += distanceMsg.total - lastDistance;
         distanceTravelledAvoidance += distanceMsg.total - lastDistance;
         lastDistance = distanceMsg.total;
-
     }
 
 
