@@ -1,5 +1,0 @@
-../Src/steering.c:23:6:steering_set_speed	16	static
-../Src/steering.c:42:5:steering_get_angle	16	static
-../Src/steering.c:61:5:steering_is_a_button_pressed	8	static
-../Src/steering.c:66:6:steering_move_with_button	16	static
-../Src/steering.c:90:6:readCalibrationData	8	static

@@ -56,7 +56,7 @@ private:
         return distance;
     }
 
-      /* Update currentAngle from motors feedback [callback function]  :
+      /* Compute and send the total distance from motors feedback [callback function]  :
     *
     * This function is called when a message is published on the "/motors_feedback" topic
     * 
@@ -64,9 +64,9 @@ private:
     void motorsFeedbackCallback(const interfaces::msg::MotorsFeedback & motorsFeedback){
 
         linearSpeed = calculateSpeed(motorsFeedback.left_rear_speed,motorsFeedback.right_rear_speed);
-        lastDistance = calculateDistance(motorsFeedback.left_rear_odometry,motorsFeedback.right_rear_odometry);
-        totalDistance += lastDistance; 
-
+        totalDistance = calculateDistance(motorsFeedback.left_rear_odometry,motorsFeedback.right_rear_odometry);
+        lastDistance = totalDistance - lastTotalDistance;
+        lastTotalDistance = totalDistance;
 
         auto odometryMsg = nav_msgs::msg::Odometry();
 
@@ -92,6 +92,7 @@ private:
 
     //Distance variables
     float totalDistance = 0.0;    //total distance traveled [cm]
+    float lastTotalDistance = 0.0;
     float lastDistance = 0.0;     //distance traveled since the last feedback
 
     //Publishers

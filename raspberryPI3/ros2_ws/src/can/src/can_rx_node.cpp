@@ -105,8 +105,8 @@ private:
                 auto motorsFeedbackMsg = interfaces::msg::MotorsFeedback();
 
                 //Update odometry
-                motorsFeedbackMsg.left_rear_odometry = frame.data[0];
-                motorsFeedbackMsg.right_rear_odometry = frame.data[1];
+                motorsFeedbackMsg.left_rear_odometry = totalOdometryLeft;
+                motorsFeedbackMsg.right_rear_odometry = totalOdometryRight;
 
                 //Update Motors speed
                 float leftSpeedMes = (frame.data[2] << 8) + frame.data[3];
@@ -125,7 +125,11 @@ private:
                 publisher_motorsFeedback_->publish(motorsFeedbackMsg);
 
 
-            } else if (frame.can_id == ID_CALIBRATION_MODE){
+            } else if (frame.can_id == ID_ODOMETRY){
+                totalOdometryLeft = (frame.data[0]<<8) + frame.data[1];
+                totalOdometryRight = (frame.data[2]<<8) + frame.data[3]; 
+            
+            }else if (frame.can_id == ID_CALIBRATION_MODE){
                 auto calibrationMsg = interfaces::msg::SteeringCalibration();
                 
                 if (frame.data[0]==CALIBRATION_IN_PROGRESS){
@@ -373,6 +377,10 @@ private:
     struct sockaddr_can addr;
     struct ifreq ifr;
     struct can_frame frame;
+
+    //Odometry variables
+    int totalOdometryLeft = 0;
+    int totalOdometryRight = 0;
 
     //US variables
     int usFrontLeft, usFrontRight, usFrontCenter, usRearLeft, usRearRight, usRearCenter;

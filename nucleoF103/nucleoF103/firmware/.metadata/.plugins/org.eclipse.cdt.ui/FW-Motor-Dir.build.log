@@ -1,0 +1,10 @@
+10:16:21 **** Incremental Build of configuration Debug for project FW-Motor-Dir ****
+make -j8 all 
+arm-none-eabi-size   FW-Motor-Dir.elf 
+   text	   data	    bss	    dec	    hex	filename
+  29008	     48	   2296	  31352	   7a78	FW-Motor-Dir.elf
+Finished building: default.size.stdout
+ 
+
+10:16:22 Build Finished. 0 errors, 0 warnings. (took 111ms)
+

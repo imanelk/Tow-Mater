@@ -1,8 +1,0 @@
-../Src/FLASH_PAGE_F1.c:27:17:GetPage	24	static
-../Src/FLASH_PAGE_F1.c:44:6:float2Bytes	24	static
-../Src/FLASH_PAGE_F1.c:59:7:Bytes2float	32	static
-../Src/FLASH_PAGE_F1.c:74:10:Flash_Write_Data	56	static
-../Src/FLASH_PAGE_F1.c:125:6:Flash_Read_Data	24	static
-../Src/FLASH_PAGE_F1.c:136:6:Convert_To_Str	32	static
-../Src/FLASH_PAGE_F1.c:147:6:Flash_Write_NUM	16	static
-../Src/FLASH_PAGE_F1.c:156:7:Flash_Read_NUM	24	static
