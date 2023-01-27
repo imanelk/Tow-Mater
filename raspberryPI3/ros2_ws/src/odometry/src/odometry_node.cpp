@@ -56,7 +56,7 @@ private:
         return distance;
     }
 
-      /* Update currentAngle from motors feedback [callback function]  :
+      /* Compute and send the total distance from motors feedback [callback function]  :
     *
     * This function is called when a message is published on the "/motors_feedback" topic
     * 

@@ -546,7 +546,7 @@ private:
     }
     
 
-    /* Publish the hook locking order on the /hook topic
+    /* Publish the hook unlocking order on the /hook topic
     *
     */
     void unlockHook(){
@@ -564,7 +564,7 @@ private:
     }
 
 
-    /* Publish the hook unlocking order on the /hook topic
+    /* Publish the hook locking order on the /hook topic
     *
     */
     void lockHook(){

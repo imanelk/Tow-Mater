@@ -40,7 +40,7 @@
 #define NS_DISTANCE 75 //NormalSecurity Distance [cm]
 #define LLS_DISTANCE 15 //LowLevelSecurity Distance [cm]
 #define AVOIDANCE_DISTANCE 25 //Avoidance Distance [cm]
-#define TOW_DISTANCE 100 //LowLevelSecurity Distance [cm]
+#define TOW_DISTANCE 100 //Towing Security Distance [cm]
 
 
 // State machine
